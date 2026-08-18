@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Monitoring Mitra Kerja KPPN Tobelo</title>
+<style>
+
+
+:root{--navy:#0D2B4E;--navy-mid:#1B4272;--teal:#0F7BA2;--teal-light:#E8F4F8;--green:#1A7A4A;--green-bg:#EAF6EF;--red:#C0392B;--red-bg:#FDECEA;--amber:#D97706;--amber-bg:#FEF3C7;--gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;--gray-400:#94A3B8;--gray-600:#475569;--gray-800:#1E293B;--white:#FFFFFF;--border:#E2E8F0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,var(--teal) 100%);color:white;padding:18px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(13,43,78,.3)}
+.header-logo{width:50px;height:50px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.header-title h1{font-size:1.2rem;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.header-title p{font-size:.78rem;opacity:.7;margin-top:2px}
+.header-meta{margin-left:auto;text-align:right}
+.header-meta .period{font-size:.72rem;opacity:.65}
+.header-meta .update{font-size:.82rem;font-weight:700;opacity:.9}
+.nav{background:var(--navy);display:flex;padding:0 28px;border-bottom:2px solid rgba(255,255,255,.1)}
+.nav-tab{color:rgba(255,255,255,.6);padding:12px 18px;font-size:.84rem;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;user-select:none}
+.nav-tab:hover{color:rgba(255,255,255,.9)}
+.nav-tab.active{color:white;border-bottom-color:#5BC4E8;font-weight:700}
+.content{padding:22px 28px;max-width:1400px}
+.page{display:none}
+.page.active{display:block}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.card{background:white;border-radius:12px;padding:16px 20px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.card-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:6px}
+.card-value{font-size:2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.card-sub{font-size:.73rem;color:var(--gray-600);margin-top:4px}
+.card.green .card-value{color:var(--green)}
+.card.red .card-value{color:var(--red)}
+.card.amber .card-value{color:var(--amber)}
+.card.blue .card-value{color:var(--teal)}
+.section{background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.section-header{padding:13px 18px;background:var(--gray-50);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.section-title{font-size:.9rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-blue{background:var(--teal-light);color:var(--teal)}
+.filter-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:white;font-size:.73rem;font-weight:600;cursor:pointer;color:var(--gray-600);transition:all .15s}
+.filter-btn:hover,.filter-btn.active{background:var(--navy);border-color:var(--navy);color:white}
+.search-input{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);font-size:.76rem;outline:none;min-width:190px}
+.search-input:focus{border-color:var(--teal)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.79rem}
+thead th{padding:10px 12px;text-align:left;background:var(--gray-50);font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-600);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{background:var(--gray-100)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--gray-50)}
+tbody tr:last-child{border-bottom:none}
+td{padding:9px 12px;vertical-align:middle}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.pill-green{background:var(--green-bg);color:var(--green)}
+.pill-red{background:var(--red-bg);color:var(--red)}
+.pill-amber{background:var(--amber-bg);color:var(--amber)}
+.pill-gray{background:var(--gray-100);color:var(--gray-600)}
+.pbar-wrap{display:flex;align-items:center;gap:7px;min-width:130px}
+.pbar{flex:1;height:6px;background:var(--gray-200);border-radius:4px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:4px}
+.pbar-fill.green{background:var(--green)}
+.pbar-fill.red{background:var(--red)}
+.pbar-fill.amber{background:var(--amber)}
+.pbar-label{font-size:.73rem;font-weight:700;min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.pbar-label.green{color:var(--green)}
+.pbar-label.red{color:var(--red)}
+.pbar-label.amber{color:var(--amber)}
+.satker-name{line-height:1.35;max-width:280px}
+.satker-code{font-size:.67rem;color:var(--gray-400);font-family:monospace;margin-top:1px}
+.target-note{font-size:.72rem;color:#92400E;padding:8px 18px;background:var(--amber-bg);border-top:1px solid #FDE68A;display:flex;align-items:center;gap:6px}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}
+@media(max-width:680px){.overview-grid{grid-template-columns:1fr}}
+.gauge-wrap{padding:24px 20px;display:flex;flex-direction:column;align-items:center}
+.gauge-label{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-600);margin-bottom:14px;text-align:center}
+.donut-svg{width:150px;height:150px}
+.donut-track{transition:stroke-dasharray .9s cubic-bezier(.4,0,.2,1),stroke-dashoffset .9s cubic-bezier(.4,0,.2,1)}
+.donut-text{font-size:1.6rem;font-weight:800;fill:var(--navy);font-family:'Segoe UI',sans-serif;dominant-baseline:middle;text-anchor:middle}
+.donut-sub{font-size:.62rem;fill:var(--gray-400);font-family:'Segoe UI',sans-serif;dominant-baseline:middle;text-anchor:middle}
+.gauge-legend{margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--gray-600)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border);font-size:.74rem;color:var(--gray-600);flex-wrap:wrap;gap:8px}
+.page-btns{display:flex;gap:3px}
+.page-btn{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-size:.73rem;color:var(--gray-600)}
+.page-btn:hover{background:var(--gray-100)}
+.page-btn.cur{background:var(--navy);color:white;border-color:var(--navy)}
+.page-btn:disabled{opacity:.4;cursor:default}
+.info-box{background:var(--teal-light);border:1px solid #BAE6FD;border-radius:10px;padding:11px 16px;margin-bottom:16px;font-size:.8rem;color:#0369A1;display:flex;align-items:flex-start;gap:8px}
+.no-data{text-align:center;padding:32px;color:var(--gray-400);font-size:.84rem}
+.sort-arrow{opacity:.4;font-size:.65rem}
+th.sorted .sort-arrow{opacity:1}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,43,78,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:white;border-radius:16px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(13,43,78,.3);transform:translateY(16px);transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .3s ease;opacity:0}
+.modal-overlay.open .modal{transform:translateY(0);opacity:1}
+.modal-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,var(--teal) 100%);color:white;padding:20px 24px 16px;border-radius:16px 16px 0 0;position:sticky;top:0;z-index:1}
+.modal-kode{font-size:.72rem;opacity:.65;font-family:monospace;letter-spacing:.04em;margin-bottom:4px}
+.modal-nama{font-size:1.1rem;font-weight:700;line-height:1.3;margin-bottom:2px}
+.modal-close{position:absolute;top:16px;right:18px;width:30px;height:30px;background:rgba(255,255,255,.15);border:none;color:white;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.modal-close:hover{background:rgba(255,255,255,.3)}
+.modal-body{padding:20px 24px}
+.modal-section{margin-bottom:20px}
+.modal-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.modal-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:var(--gray-50);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+.stat-box-val{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.stat-box-lbl{font-size:.68rem;color:var(--gray-500,#6B7280);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.stat-box.cms .stat-box-val{color:var(--teal)}
+.stat-box.debit .stat-box-val{color:#3B82F6}
+.stat-box.teller .stat-box-val{color:var(--amber)}
+.donut-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donut-small{flex-shrink:0}
+.donut-info{flex:1;min-width:180px}
+.donut-pct{font-size:2.2rem;font-weight:800;line-height:1}
+.donut-pct.green{color:var(--green)}
+.donut-pct.red{color:var(--red)}
+.donut-pct.amber{color:var(--amber)}
+.donut-caption{font-size:.78rem;color:var(--gray-600);margin-top:3px}
+.saran-box{border-radius:10px;padding:13px 16px;font-size:.82rem;font-weight:600;line-height:1.45}
+.saran-box.good{background:var(--green-bg);color:var(--green);border:1px solid #BBF7D0}
+.saran-box.warn{background:var(--amber-bg);color:#92400E;border:1px solid #FDE68A}
+.saran-box.bad{background:var(--red-bg);color:var(--red);border:1px solid #FECACA}
+.saran-box .saran-title{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;opacity:.7;margin-bottom:4px}
+.kkp-detail-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.kkp-stat{background:var(--gray-50);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.kkp-stat-val{font-size:1.5rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.kkp-stat-lbl{font-size:.68rem;color:var(--gray-400);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.no-kkp-box{background:var(--gray-100);border-radius:10px;padding:14px 16px;text-align:center;font-size:.82rem;color:var(--gray-400)}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover td:first-child{color:var(--teal)}
+tbody tr.clickable td:first-child::after{content:' ↗';font-size:.65rem;opacity:0;transition:opacity .15s;color:var(--teal)}
+tbody tr.clickable:hover td:first-child::after{opacity:1}
+
+/* SATKER SPOTLIGHT */
+.spotlight-wrap{background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.spotlight-header{padding:13px 18px;background:var(--gray-50);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.spotlight-title{font-size:.9rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.satker-select{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:.8rem;outline:none;color:var(--navy);font-weight:600;background:white;cursor:pointer;min-width:340px;max-width:100%}
+.satker-select:focus{border-color:var(--teal)}
+.satker-combo{position:relative;min-width:340px;max-width:100%}
+.satker-combo input{width:100%;padding:7px 32px 7px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:.8rem;outline:none;color:var(--navy);font-weight:600;background:white;box-sizing:border-box}
+.satker-combo input:focus{border-color:var(--teal)}
+.satker-combo .combo-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--gray-400);pointer-events:none}
+.satker-combo .combo-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:1.5px solid var(--border);border-radius:8px;max-height:280px;overflow-y:auto;z-index:50;box-shadow:0 8px 24px rgba(13,43,78,.12);display:none}
+.satker-combo .combo-list.open{display:block}
+.satker-combo .combo-item{padding:8px 14px;font-size:.8rem;color:var(--navy);cursor:pointer;font-weight:500}
+.satker-combo .combo-item:hover,.satker-combo .combo-item.active{background:var(--gray-50)}
+.satker-combo .combo-item .combo-kode{color:var(--gray-400);font-weight:600;font-size:.72rem;margin-left:4px}
+.satker-combo .combo-empty{padding:10px 14px;font-size:.78rem;color:var(--gray-400);text-align:center}
+.spotlight-body{padding:20px 22px}
+.sp-status-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.sp-status-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.76rem;font-weight:700}
+.sp-status-chip.green{background:var(--green-bg);color:var(--green)}
+.sp-status-chip.red{background:var(--red-bg);color:var(--red)}
+.sp-status-chip.amber{background:var(--amber-bg);color:#92400E}
+.sp-status-chip.gray{background:var(--gray-100);color:var(--gray-600)}
+.sp-status-chip.Cepat{background:#ECFDF5;color:#065F46}
+.sp-status-chip.Normal{background:#EFF6FF;color:#1E40AF}
+.sp-status-chip.Lambat{background:#FFF7ED;color:#92400E}
+.sp-status-chip.nodata{background:var(--gray-100);color:var(--gray-600)}
+.sp-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:620px){.sp-charts-grid{grid-template-columns:1fr}}
+.sp-chart-box{background:var(--gray-50);border:1px solid var(--border);border-radius:10px;padding:16px}
+.sp-chart-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:14px}
+.sp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sp-bar-label{font-size:.75rem;font-weight:600;color:var(--gray-600);width:70px;flex-shrink:0;text-align:right}
+.sp-bar-track{flex:1;height:22px;background:var(--gray-200);border-radius:6px;overflow:hidden;position:relative}
+.sp-bar-fill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:flex-end;padding-right:7px;min-width:0}
+.sp-bar-fill span{font-size:.68rem;font-weight:700;color:white;white-space:nowrap}
+.sp-bar-val{font-size:.75rem;font-weight:700;color:var(--gray-600);width:50px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.sp-pct-big{font-size:2.4rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:3px}
+.sp-pct-big.green{color:var(--green)}
+.sp-pct-big.red{color:var(--red)}
+.sp-pct-big.amber{color:var(--amber)}
+.sp-pct-big.gray{color:var(--gray-400)}
+.sp-kkp-progress{margin-top:6px}
+.sp-prog-track{height:14px;background:var(--gray-200);border-radius:8px;overflow:hidden;margin:8px 0 5px}
+.sp-prog-fill{height:100%;border-radius:8px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.sp-no-kkp{font-size:.8rem;color:var(--gray-400);text-align:center;padding:14px 0}
+.lpj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:620px){.lpj-grid{grid-template-columns:1fr}}
+.lpj-box{background:var(--gray-50);border:1px solid var(--border);border-radius:10px;padding:16px}
+.lpj-box-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:12px}
+.lpj-na{font-size:.8rem;color:var(--gray-400);font-style:italic;padding:8px 0}
+.lpj-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:.76rem;font-weight:700;margin-bottom:12px}
+.lpj-badge.satset{background:#ECFDF5;color:#065F46}
+.lpj-badge.tertib{background:#EFF6FF;color:#1E40AF}
+.lpj-badge.mepet{background:#FFF7ED;color:#92400E}
+.lpj-badge.belum{background:var(--red-bg);color:var(--red)}
+.lpj-badge.nodata{background:var(--gray-100);color:var(--gray-600)}
+.lpj-avg{font-size:1.8rem;font-weight:800;color:var(--navy);line-height:1;margin-bottom:2px}
+.lpj-avg-sub{font-size:.72rem;color:var(--gray-400);margin-bottom:14px}
+.lpj-history{display:flex;flex-direction:column;gap:5px}
+.lpj-row{display:flex;align-items:center;gap:8px;font-size:.74rem}
+.lpj-month{width:32px;color:var(--gray-400);font-weight:600;flex-shrink:0}
+.lpj-bar-wrap{flex:1;height:16px;background:var(--gray-200);border-radius:5px;overflow:hidden;position:relative}
+.lpj-bar-fill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;padding-left:6px}
+.lpj-bar-fill span{font-size:.65rem;font-weight:700;color:white;white-space:nowrap}
+.lpj-bar-fill.belum{background:var(--gray-300)}
+.lpj-tgl{width:38px;text-align:right;font-weight:700;color:var(--gray-600);flex-shrink:0;font-size:.72rem}
+.lpj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lpj-dot.satset{background:#065F46}
+.lpj-dot.tertib{background:#1E40AF}
+.lpj-dot.mepet{background:#D97706}
+.lpj-dot.belum{background:var(--red)}
+.lpj-dot.nodata{background:var(--gray-300)}
+
+.lpj-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.lpj-stat-card{background:white;border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center}
+.lpj-stat-val{font-size:1.8rem;font-weight:800;line-height:1}
+.lpj-stat-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);margin-top:4px;font-weight:700}
+.lpj-satset{color:#065F46}.lpj-tertib{color:#1E40AF}.lpj-mepet{color:var(--amber)}.lpj-belum{color:var(--red)}.lpj-na{color:var(--gray-400)}
+.tab-sub{display:flex;gap:8px;padding:14px 18px;background:var(--gray-50);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab-sub-btn{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:.78rem;font-weight:600;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s}
+.tab-sub-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+.lpj-panel{display:none}.lpj-panel.active{display:block}
+
+.lpj-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.lpj-stat-card{background:white;border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center}
+.lpj-stat-val{font-size:1.8rem;font-weight:800;line-height:1}
+.lpj-stat-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);margin-top:4px;font-weight:700}
+.lpj-satset{color:#065F46}.lpj-tertib{color:#1E40AF}.lpj-mepet{color:var(--amber)}.lpj-belum{color:var(--red)}.lpj-na{color:var(--gray-400)}
+.tab-sub{display:flex;gap:8px;padding:14px 18px;background:var(--gray-50);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab-sub-btn{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:.78rem;font-weight:600;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s}
+.tab-sub-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+.lpj-panel{display:none}.lpj-panel.active{display:block}
+
+/* LPJ in modal */
+.modal-lpj-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+@media(max-width:500px){.modal-lpj-grid{grid-template-columns:1fr}}
+.modal-lpj-box{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.modal-lpj-box-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.modal-lpj-na{font-size:.78rem;color:var(--gray-400);font-style:italic;padding:6px 0}
+.modal-lpj-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:14px;font-size:.73rem;font-weight:700;margin-bottom:8px}
+.modal-lpj-badge.Cepat{background:#ECFDF5;color:#065F46}
+.modal-lpj-badge.Normal{background:#EFF6FF;color:#1E40AF}
+.modal-lpj-badge.Lambat{background:#FFF7ED;color:#92400E}
+.modal-lpj-badge.belum{background:var(--red-bg);color:var(--red)}
+.modal-lpj-rata{font-size:1.4rem;font-weight:800;color:var(--navy);line-height:1}
+.modal-lpj-rata-lbl{font-size:.68rem;color:var(--gray-400);margin-bottom:10px;margin-top:2px}
+.modal-lpj-hist{display:flex;flex-direction:column;gap:4px}
+.modal-lpj-row{display:flex;align-items:center;gap:6px;font-size:.72rem}
+.modal-lpj-month{width:28px;color:var(--gray-400);font-weight:600;flex-shrink:0}
+.modal-lpj-bar-wrap{flex:1;height:12px;background:var(--gray-200);border-radius:4px;overflow:hidden}
+.modal-lpj-bar{height:100%;border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.modal-lpj-tgl{width:34px;text-align:right;font-weight:700;color:var(--gray-600);flex-shrink:0;font-family:monospace;font-size:.7rem}
+.modal-lpj-terlambat{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;font-size:.68rem;font-weight:700;background:var(--red-bg);color:var(--red);margin-top:6px}
+
+/* ── RPD Hal. III DIPA ── */
+.rpd-filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px 18px 8px}
+.rpd-bulan-tabs{display:flex;gap:5px;flex-wrap:wrap}
+.rpd-bulan-btn{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:.73rem;font-weight:600;cursor:pointer;color:var(--gray-600);transition:all .15s}
+.rpd-bulan-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.rpd-bulan-btn.belum{opacity:.38;cursor:not-allowed;background:#F1F5F9;pointer-events:none}
+.rpd-search{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none;min-width:200px}
+.rpd-search:focus{border-color:var(--teal)}
+.rpd-filter-sel{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.76rem;outline:none;background:#fff;cursor:pointer}
+.rpd-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px 18px}
+@media(max-width:700px){.rpd-stat-grid{grid-template-columns:repeat(2,1fr)}}
+.rpd-stat-card{background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.rpd-stat-val{font-size:1.5rem;font-weight:800;line-height:1;margin-bottom:3px}
+.rpd-stat-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400)}
+.rpd-green{color:#065F46}.rpd-amber{color:#D97706}.rpd-red{color:var(--red)}.rpd-gray{color:var(--gray-400)}
+.rpd-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;white-space:nowrap}
+.rpd-badge.on{background:#ECFDF5;color:#065F46}
+.rpd-badge.was{background:#FFF7ED;color:#92400E}
+.rpd-badge.ting{background:var(--red-bg);color:var(--red)}
+.rpd-badge.nd{background:#F1F5F9;color:var(--gray-400)}
+.rpd-mini-bar{height:5px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-top:3px;width:100%}
+.rpd-mini-bar-fill{height:100%;border-radius:3px}
+
+/* ── RPD Hal III DIPA ── */
+.rpd-bulan-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rpd-bulan-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:white;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--gray-600)}
+.rpd-bulan-btn:hover{border-color:var(--teal);color:var(--teal)}
+.rpd-bulan-btn.active{background:var(--teal);color:white;border-color:var(--teal)}
+.rpd-bulan-btn.no-data{opacity:.4;cursor:not-allowed}
+.rpd-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px 18px}
+@media(max-width:700px){.rpd-summary-grid{grid-template-columns:1fr 1fr}}
+.rpd-scard{background:white;border-radius:10px;border:1px solid var(--border);padding:13px 15px}
+.rpd-scard-val{font-size:1.5rem;font-weight:800;color:var(--navy);line-height:1}
+.rpd-scard-lbl{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);margin-bottom:4px}
+.rpd-scard-sub{font-size:.7rem;color:var(--gray-500);margin-top:3px}
+.rpd-scard.green .rpd-scard-val{color:var(--green)}
+.rpd-scard.amber .rpd-scard-val{color:#D97706}
+.rpd-scard.red .rpd-scard-val{color:var(--red)}
+.rpd-status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700}
+.rpd-on-track{background:#ECFDF5;color:#065F46}
+.rpd-waspada{background:#FFF7ED;color:#92400E}
+.rpd-tinggi{background:#FEF2F2;color:#991B1B}
+.rpd-na{background:#F1F5F9;color:#64748B}
+.rpd-bar-wrap{width:100%;height:7px;background:var(--gray-200);border-radius:4px;margin-top:4px;overflow:hidden}
+.rpd-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.rpd-search-bar{display:flex;gap:10px;align-items:center;padding:10px 18px;flex-wrap:wrap}
+.rpd-search-bar input{flex:1;min-width:200px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none}
+.rpd-search-bar input:focus{border-color:var(--teal)}
+.rpd-search-bar select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;outline:none;background:white;cursor:pointer}
+.rpd-jenis-tabs{display:flex;gap:6px;padding:0 18px 10px;flex-wrap:wrap}
+.rpd-jenis-btn{padding:4px 12px;border-radius:16px;border:1.5px solid var(--border);background:white;font-size:.72rem;font-weight:600;cursor:pointer;color:var(--gray-600);transition:all .15s}
+.rpd-jenis-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">🏛️</div>
+  <div class="header-title">
+    <h1>Dashboard Monitoring Mitra Kerja</h1>
+    <p>KPPN Tobelo — Direktorat Jenderal Perbendaharaan</p>
+  </div>
+  <div class="header-meta">
+    <div class="period">Periode data</div>
+    <div class="update">Januari - Agustus 2026</div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">📊 Ringkasan</div>
+  <div class="nav-tab" data-tab="cms" onclick="switchTab('cms')">💳 Digitalisasi CMS</div>
+  <div class="nav-tab" data-tab="kkp" onclick="switchTab('kkp')">🏷️ KKP Transaksi</div>
+  <div class="nav-tab" data-tab="lpj" onclick="switchTab('lpj')">📋 LPJ Bendahara</div>
+  <div class="nav-tab" data-tab="gaji" onclick="switchTab('gaji')">💰 Gaji Induk</div>
+  <div class="nav-tab" data-tab="pppk" onclick="switchTab('pppk')">💵 Gaji PPPK</div>
+  <div class="nav-tab" data-tab="rekon" onclick="switchTab('rekon')">🔄 Rekon SHR</div>
+  <div class="nav-tab" data-tab="capaian" onclick="switchTab('capaian')">🎯 Capaian Output</div>
+</div>
+
+<div class="content">
+<!-- OVERVIEW -->
+<div class="page active" id="page-overview">
+  <!-- GLOBAL CMS BANNER (rendered dynamically from CMS_DATA — see renderOverviewStats()) -->
+  <div id="cms-banner"></div>
+
+  <div class="summary-grid" id="summary-cards"></div>
+
+  <div class="overview-grid" id="overview-gauges"></div>
+
+  <!-- SATKER SPOTLIGHT -->
+  <div class="spotlight-wrap">
+    <div class="spotlight-header">
+      <div class="spotlight-title">🔍 Sorotan Capaian per Satker</div>
+      <div class="satker-combo" id="satker-combo">
+        <input type="text" id="satker-search" placeholder="Cari atau pilih satker..." autocomplete="off"
+          onfocus="comboOpen()" oninput="comboFilter(this.value)" onkeydown="comboKeydown(event)">
+        <span class="combo-arrow">▼</span>
+        <div class="combo-list" id="satker-combo-list"></div>
+      </div>
+    </div>
+    <div class="spotlight-body" id="spotlight-body">
+      <div style="text-align:center;padding:28px;color:var(--gray-400);font-size:.84rem">Pilih satker dari dropdown di atas untuk melihat grafik capaiannya.</div>
+    </div>
+  </div>
+
+</div>
+<!-- CMS -->
+<div class="page" id="page-cms">
+  <div class="info-box">ℹ️ <span><strong>Target:</strong> Jumlah transaksi CMS ≥ 70% dari total transaksi (CMS + Teller + Kartu Debit). Data diakumulasi per kode satker dari Bank BNI, Bank Mandiri, dan Bank BRI. Nama satker menggunakan data IKPA.</span></div>
+    <div class="section">
+    <div class="section-header">
+      <div class="section-title">📋 Detail Capaian per Satker</div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterCMS('all',this)">Semua (38)</button>
+        <button class="filter-btn" onclick="filterCMS('ok',this)">✅ ≥70%</button>
+        <button class="filter-btn" onclick="filterCMS('below',this)">❌ &lt;70%</button>
+        <button class="filter-btn" onclick="filterCMS('zero',this)">⚪ Nol Trx</button>
+        <input class="search-input" type="text" placeholder="🔍 Cari nama / kode satker..." oninput="searchCMS(this.value)">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="cms-table">
+        <thead><tr>
+          <th onclick="sortCMS('nama')" id="th-nama">SATKER <span class="sort-arrow">↕</span></th>
+          <th onclick="sortCMS('cms')" class="num" id="th-cms" style="text-align:right">CMS <span class="sort-arrow">↕</span></th>
+          <th onclick="sortCMS('debit')" class="num" id="th-debit" style="text-align:right">Debit <span class="sort-arrow">↕</span></th>
+          <th onclick="sortCMS('teller')" class="num" id="th-teller" style="text-align:right">Teller <span class="sort-arrow">↕</span></th>
+          <th onclick="sortCMS('total')" class="num" id="th-total" style="text-align:right">Total <span class="sort-arrow">↕</span></th>
+          <th onclick="sortCMS('pct')" id="th-pct" style="min-width:140px">% CMS <span class="sort-arrow">↕</span></th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody id="cms-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span id="cms-count"></span>
+      <div class="page-btns" id="cms-pages"></div>
+    </div>
+  </div>
+</div>
+
+<!-- KKP -->
+<div class="page" id="page-kkp">
+  <div class="info-box">ℹ️ <span><strong>Target:</strong> Satker yang memiliki proporsi UP KKP (domestik dan/atau non-domestik) <strong>wajib</strong> melakukan minimal <strong>10 transaksi KKP</strong>. Terdapat 38 satker aktif yang wajib memenuhi ketentuan ini.</span></div>
+    <div class="section">
+    <div class="section-header">
+      <div class="section-title">🏷️ Detail Transaksi KKP per Satker</div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterKKP('all',this)">Semua (38)</button>
+        <button class="filter-btn" onclick="filterKKP('ok',this)">✅ ≥10 Trx</button>
+        <button class="filter-btn" onclick="filterKKP('below',this)">❌ &lt;10 Trx</button>
+        <input class="search-input" type="text" placeholder="🔍 Cari nama / kode satker..." oninput="searchKKP(this.value)">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortKKP('nama')" id="th-kkp-nama">SATKER <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortKKP('dom')" class="num" id="th-kkp-dom" style="text-align:right">UP KKP Domestik <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortKKP('nondom')" class="num" id="th-kkp-nondom" style="text-align:right">UP KKP Non-Dom <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortKKP('trx')" class="num" id="th-kkp-trx" style="text-align:right">Trx KKP <span class="sort-arrow">⇕</span></th>
+          <th style="min-width:140px">Progress (Target: 10)</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody id="kkp-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span id="kkp-count"></span>
+      <div class="page-btns" id="kkp-pages"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<!-- LPJ PAGE -->
+
+<div class="page" id="page-lpj"><div class="section"><div class="section-header"><div class="section-title">&#128203; Monitoring LPJ Bendahara</div><div style="font-size:.75rem;color:var(--gray-400)">Deadline penyampaian: tgl 10 setiap bulan</div></div><div class="tab-sub"><button class="tab-sub-btn active" onclick="switchLpj('pengeluaran',this)">&#128181; Bendahara Pengeluaran <span id="lpj-tabcount-pengeluaran" style="background:#E2E8F0;border-radius:10px;padding:1px 7px;font-size:.72rem;margin-left:4px">0 satker</span></button><button class="tab-sub-btn" onclick="switchLpj('penerimaan',this)">&#128176; Bendahara Penerimaan <span id="lpj-tabcount-penerimaan" style="background:#E2E8F0;border-radius:10px;padding:1px 7px;font-size:.72rem;margin-left:4px">0 satker</span></button></div><div class="lpj-panel active" id="lpj-pengeluaran">
+      <div style="padding:16px 18px">
+        <div class="lpj-stat-grid" id="lpj-stats-pengeluaran"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+          <input type="text" id="lpj-search-pengeluaran" placeholder="&#128269; Cari nama atau kode satker..." oninput="lpjFilter('pengeluaran')" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none;">
+          <select id="lpj-filter-pengeluaran" onchange="lpjFilter('pengeluaran')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;outline:none;background:white;cursor:pointer">
+            <option value="">Semua Klasifikasi</option>
+            <option value="Cepat">&#128640; Cepat</option>
+            <option value="Normal">&#128077; Normal</option>
+            <option value="Lambat">&#128293; Lambat</option>
+            <option value="na">&#10060; Bukan Wajib</option>
+          </select>
+          <span id="lpj-count-pengeluaran" style="font-size:.75rem;color:var(--gray-400)"></span>
+        </div>
+      </div>
+      <div id="lpj-table-pengeluaran" style="overflow-x:auto;padding:0 18px 18px">
+        <table class="data-table">
+          <thead><tr>
+            <th onclick="lpjSortCol('pengeluaran','kode')" style="cursor:pointer;user-select:none">Kode <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-kode">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('pengeluaran','nama')" style="cursor:pointer;user-select:none">Nama Satker <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-nama">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m1')" style="cursor:pointer;user-select:none;white-space:nowrap">Jan <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m1">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m2')" style="cursor:pointer;user-select:none;white-space:nowrap">Feb <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m2">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m3')" style="cursor:pointer;user-select:none;white-space:nowrap">Mar <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m3">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m4')" style="cursor:pointer;user-select:none;white-space:nowrap">Apr <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m4">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m5')" style="cursor:pointer;user-select:none;white-space:nowrap">Mei <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m5">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m6')" style="cursor:pointer;user-select:none;white-space:nowrap">Jun <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m6">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m7')" style="cursor:pointer;user-select:none;white-space:nowrap">Jul <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m7">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m8')" style="cursor:pointer;user-select:none;white-space:nowrap">Agu <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m8">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m9')" style="cursor:pointer;user-select:none;white-space:nowrap">Sep <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m9">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m10')" style="cursor:pointer;user-select:none;white-space:nowrap">Okt <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m10">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m11')" style="cursor:pointer;user-select:none;white-space:nowrap">Nov <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m11">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('pengeluaran','m12')" style="cursor:pointer;user-select:none;white-space:nowrap">Des <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-m12">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('pengeluaran','rata2')" style="cursor:pointer;user-select:none;white-space:nowrap">Rata-rata <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-rata2">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('pengeluaran','kls')" style="cursor:pointer;user-select:none">Klasifikasi <span class="lpj-sort-arrow" id="lpjsa-pengeluaran-kls">&#x21D5;</span></th>
+          </tr></thead>
+          <tbody id="lpj-tbody-pengeluaran"></tbody>
+        </table>
+      </div>
+    </div><div class="lpj-panel" id="lpj-penerimaan">
+      <div style="padding:16px 18px">
+        <div class="lpj-stat-grid" id="lpj-stats-penerimaan"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+          <input type="text" id="lpj-search-penerimaan" placeholder="&#128269; Cari nama atau kode satker..." oninput="lpjFilter('penerimaan')" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none;">
+          <select id="lpj-filter-penerimaan" onchange="lpjFilter('penerimaan')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.78rem;outline:none;background:white;cursor:pointer">
+            <option value="">Semua Klasifikasi</option>
+            <option value="Cepat">&#128640; Cepat</option>
+            <option value="Normal">&#128077; Normal</option>
+            <option value="Lambat">&#128293; Lambat</option>
+            <option value="na">&#10060; Bukan Wajib</option>
+          </select>
+          <span id="lpj-count-penerimaan" style="font-size:.75rem;color:var(--gray-400)"></span>
+        </div>
+      </div>
+      <div id="lpj-table-penerimaan" style="overflow-x:auto;padding:0 18px 18px">
+        <table class="data-table">
+          <thead><tr>
+            <th onclick="lpjSortCol('penerimaan','kode')" style="cursor:pointer;user-select:none">Kode <span class="lpj-sort-arrow" id="lpjsa-penerimaan-kode">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('penerimaan','nama')" style="cursor:pointer;user-select:none">Nama Satker <span class="lpj-sort-arrow" id="lpjsa-penerimaan-nama">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m1')" style="cursor:pointer;user-select:none;white-space:nowrap">Jan <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m1">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m2')" style="cursor:pointer;user-select:none;white-space:nowrap">Feb <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m2">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m3')" style="cursor:pointer;user-select:none;white-space:nowrap">Mar <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m3">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m4')" style="cursor:pointer;user-select:none;white-space:nowrap">Apr <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m4">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m5')" style="cursor:pointer;user-select:none;white-space:nowrap">Mei <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m5">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m6')" style="cursor:pointer;user-select:none;white-space:nowrap">Jun <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m6">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m7')" style="cursor:pointer;user-select:none;white-space:nowrap">Jul <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m7">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m8')" style="cursor:pointer;user-select:none;white-space:nowrap">Agu <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m8">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m9')" style="cursor:pointer;user-select:none;white-space:nowrap">Sep <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m9">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m10')" style="cursor:pointer;user-select:none;white-space:nowrap">Okt <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m10">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m11')" style="cursor:pointer;user-select:none;white-space:nowrap">Nov <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m11">&#x21D5;</span></th>
+            <th class="num" onclick="lpjSortCol('penerimaan','m12')" style="cursor:pointer;user-select:none;white-space:nowrap">Des <span class="lpj-sort-arrow" id="lpjsa-penerimaan-m12">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('penerimaan','rata2')" style="cursor:pointer;user-select:none;white-space:nowrap">Rata-rata <span class="lpj-sort-arrow" id="lpjsa-penerimaan-rata2">&#x21D5;</span></th>
+            <th onclick="lpjSortCol('penerimaan','kls')" style="cursor:pointer;user-select:none">Klasifikasi <span class="lpj-sort-arrow" id="lpjsa-penerimaan-kls">&#x21D5;</span></th>
+          </tr></thead>
+          <tbody id="lpj-tbody-penerimaan"></tbody>
+        </table>
+      </div>
+    </div></div></div>
+
+<div class="page" id="page-gaji">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">💰 Gaji Induk — PNS / Polri / TNI</div>
+      <div style="font-size:.75rem;color:var(--gray-400)">Kecepatan penyampaian SPM Gaji Induk · Klasifikasi: 1-6 Cepat, 7-12 Normal, ≥13 Lambat</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px 0">
+      <button class="filter-btn active" onclick="filterMonthly('gaji','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterMonthly('gaji','cepat',this)">🚀 Cepat</button>
+      <button class="filter-btn" onclick="filterMonthly('gaji','normal',this)">👍 Normal</button>
+      <button class="filter-btn" onclick="filterMonthly('gaji','lambat',this)">🔥 Lambat</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 18px">
+      <input type="text" placeholder="🔍 Cari nama atau kode satker..." oninput="searchMonthly('gaji',this.value)" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none">
+      <span id="gaji-count" style="font-size:.75rem;color:var(--gray-400)"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortMonthly('gaji','nama')">Satker <span class="sort-arrow">⇕</span></th>
+          <th class="num" style="font-size:.68rem">Jan</th><th class="num" style="font-size:.68rem">Feb</th><th class="num" style="font-size:.68rem">Mar</th><th class="num" style="font-size:.68rem">Apr</th><th class="num" style="font-size:.68rem">Mei</th><th class="num" style="font-size:.68rem">Jun</th><th class="num" style="font-size:.68rem">Jul</th><th class="num" style="font-size:.68rem">Agu</th><th class="num" style="font-size:.68rem">Sep</th><th class="num" style="font-size:.68rem">Okt</th><th class="num" style="font-size:.68rem">Nov</th><th class="num" style="font-size:.68rem">Des</th>
+          <th class="num" onclick="sortMonthly('gaji','rata2')">Rata² Hari <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortMonthly('gaji','klasifikasi')">Klasifikasi <span class="sort-arrow">⇕</span></th>
+        </tr></thead>
+        <tbody id="gaji-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span></span>
+      <div class="page-btns" id="gaji-pages"></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-pppk">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">💵 Gaji Induk — PPPK</div>
+      <div style="font-size:.75rem;color:var(--gray-400)">Kecepatan penyampaian SPM Gaji Induk PPPK · Klasifikasi: 1-6 Cepat, 7-12 Normal, ≥13 Lambat</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px 0">
+      <button class="filter-btn active" onclick="filterMonthly('pppk','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterMonthly('pppk','cepat',this)">🚀 Cepat</button>
+      <button class="filter-btn" onclick="filterMonthly('pppk','normal',this)">👍 Normal</button>
+      <button class="filter-btn" onclick="filterMonthly('pppk','lambat',this)">🔥 Lambat</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 18px">
+      <input type="text" placeholder="🔍 Cari nama atau kode satker..." oninput="searchMonthly('pppk',this.value)" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none">
+      <span id="pppk-count" style="font-size:.75rem;color:var(--gray-400)"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortMonthly('pppk','nama')">Satker <span class="sort-arrow">⇕</span></th>
+          <th class="num" style="font-size:.68rem">Jan</th><th class="num" style="font-size:.68rem">Feb</th><th class="num" style="font-size:.68rem">Mar</th><th class="num" style="font-size:.68rem">Apr</th><th class="num" style="font-size:.68rem">Mei</th><th class="num" style="font-size:.68rem">Jun</th><th class="num" style="font-size:.68rem">Jul</th><th class="num" style="font-size:.68rem">Agu</th><th class="num" style="font-size:.68rem">Sep</th><th class="num" style="font-size:.68rem">Okt</th><th class="num" style="font-size:.68rem">Nov</th><th class="num" style="font-size:.68rem">Des</th>
+          <th class="num" onclick="sortMonthly('pppk','rata2')">Rata² Hari <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortMonthly('pppk','klasifikasi')">Klasifikasi <span class="sort-arrow">⇕</span></th>
+        </tr></thead>
+        <tbody id="pppk-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span></span>
+      <div class="page-btns" id="pppk-pages"></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-rekon">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">🔄 Rekonsiliasi SHR</div>
+      <div style="font-size:.75rem;color:var(--gray-400)">Kecepatan terbit SHR bulan berikutnya · Klasifikasi: 1-6 Cepat, 7-12 Normal, ≥13 Lambat</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px 0">
+      <button class="filter-btn active" onclick="filterMonthly('rekon','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterMonthly('rekon','cepat',this)">🚀 Cepat</button>
+      <button class="filter-btn" onclick="filterMonthly('rekon','normal',this)">👍 Normal</button>
+      <button class="filter-btn" onclick="filterMonthly('rekon','lambat',this)">🔥 Lambat</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 18px">
+      <input type="text" placeholder="🔍 Cari nama atau kode satker..." oninput="searchMonthly('rekon',this.value)" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none">
+      <span id="rekon-count" style="font-size:.75rem;color:var(--gray-400)"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortMonthly('rekon','nama')">Satker <span class="sort-arrow">⇕</span></th>
+          <th class="num" style="font-size:.68rem">Jan</th><th class="num" style="font-size:.68rem">Feb</th><th class="num" style="font-size:.68rem">Mar</th><th class="num" style="font-size:.68rem">Apr</th><th class="num" style="font-size:.68rem">Mei</th><th class="num" style="font-size:.68rem">Jun</th><th class="num" style="font-size:.68rem">Jul</th><th class="num" style="font-size:.68rem">Agu</th><th class="num" style="font-size:.68rem">Sep</th><th class="num" style="font-size:.68rem">Okt</th><th class="num" style="font-size:.68rem">Nov</th><th class="num" style="font-size:.68rem">Des</th>
+          <th class="num" onclick="sortMonthly('rekon','rata2')">Rata² Hari <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortMonthly('rekon','klasifikasi')">Klasifikasi <span class="sort-arrow">⇕</span></th>
+        </tr></thead>
+        <tbody id="rekon-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span></span>
+      <div class="page-btns" id="rekon-pages"></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-capaian">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">🎯 Capaian Output</div>
+      <div style="font-size:.75rem;color:var(--gray-400)">Kecepatan penyampaian laporan capaian output · Klasifikasi: 1-4 Cepat, 5-7 Normal, ≥8 Lambat</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px 0">
+      <button class="filter-btn active" onclick="filterMonthly('capaian','all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterMonthly('capaian','cepat',this)">🚀 Cepat</button>
+      <button class="filter-btn" onclick="filterMonthly('capaian','normal',this)">👍 Normal</button>
+      <button class="filter-btn" onclick="filterMonthly('capaian','lambat',this)">🔥 Lambat</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 18px">
+      <input type="text" placeholder="🔍 Cari nama atau kode satker..." oninput="searchMonthly('capaian',this.value)" style="flex:1;min-width:220px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;outline:none">
+      <span id="capaian-count" style="font-size:.75rem;color:var(--gray-400)"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="sortMonthly('capaian','nama')">Satker <span class="sort-arrow">⇕</span></th>
+          <th class="num" style="font-size:.68rem">Jan</th><th class="num" style="font-size:.68rem">Feb</th><th class="num" style="font-size:.68rem">Mar</th><th class="num" style="font-size:.68rem">Apr</th><th class="num" style="font-size:.68rem">Mei</th><th class="num" style="font-size:.68rem">Jun</th><th class="num" style="font-size:.68rem">Jul</th><th class="num" style="font-size:.68rem">Agu</th><th class="num" style="font-size:.68rem">Sep</th><th class="num" style="font-size:.68rem">Okt</th><th class="num" style="font-size:.68rem">Nov</th><th class="num" style="font-size:.68rem">Des</th>
+          <th class="num" onclick="sortMonthly('capaian','rata2')">Rata² Hari <span class="sort-arrow">⇕</span></th>
+          <th onclick="sortMonthly('capaian','klasifikasi')">Klasifikasi <span class="sort-arrow">⇕</span></th>
+        </tr></thead>
+        <tbody id="capaian-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span></span>
+      <div class="page-btns" id="capaian-pages"></div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-kode" id="m-kode"></div>
+      <div class="modal-nama" id="m-nama"></div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- CMS SECTION -->
+      <div class="modal-section">
+        <div class="modal-section-title">💳 Digitalisasi Pembayaran (CMS)</div>
+        <div class="stat-row">
+          <div class="stat-box cms"><div class="stat-box-val" id="m-cms">—</div><div class="stat-box-lbl">CMS</div></div>
+          <div class="stat-box debit"><div class="stat-box-val" id="m-debit">—</div><div class="stat-box-lbl">Kartu Debit</div></div>
+          <div class="stat-box teller"><div class="stat-box-val" id="m-teller">—</div><div class="stat-box-lbl">Teller</div></div>
+        </div>
+        <div class="donut-row">
+          <div class="donut-small">
+            <svg width="110" height="110" viewBox="0 0 110 110" id="m-donut-svg">
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#E2E8F0" stroke-width="13"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc"
+                stroke="#1A7A4A" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc2"
+                stroke="#3B82F6" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc3"
+                stroke="#F59E0B" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+            </svg>
+          </div>
+          <div class="donut-info">
+            <div class="donut-pct" id="m-pct-val">—</div>
+            <div class="donut-caption" id="m-pct-caption">transaksi via CMS</div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:var(--teal);border-radius:2px;margin-right:3px"></span>CMS</span>
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:#3B82F6;border-radius:2px;margin-right:3px"></span>Kartu Debit</span>
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:#F59E0B;border-radius:2px;margin-right:3px"></span>Teller</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:160px" id="m-saran-cms"></div>
+        </div>
+      </div>
+
+      <!-- KKP SECTION -->
+      <div class="modal-section" id="m-kkp-section">
+        <div class="modal-section-title">🏷️ Kartu Kredit Pemerintah (KKP)</div>
+        <div id="m-kkp-content"></div>
+      </div>
+
+    </div>
+  </div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-kode" id="m-kode"></div>
+      <div class="modal-nama" id="m-nama"></div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- CMS SECTION -->
+      <div class="modal-section">
+        <div class="modal-section-title">💳 Digitalisasi Pembayaran (CMS)</div>
+        <div class="stat-row">
+          <div class="stat-box cms"><div class="stat-box-val" id="m-cms">—</div><div class="stat-box-lbl">CMS</div></div>
+          <div class="stat-box debit"><div class="stat-box-val" id="m-debit">—</div><div class="stat-box-lbl">Kartu Debit</div></div>
+          <div class="stat-box teller"><div class="stat-box-val" id="m-teller">—</div><div class="stat-box-lbl">Teller</div></div>
+        </div>
+        <div class="donut-row">
+          <div class="donut-small">
+            <svg width="110" height="110" viewBox="0 0 110 110" id="m-donut-svg">
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#E2E8F0" stroke-width="13"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc"
+                stroke="#1A7A4A" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc2"
+                stroke="#3B82F6" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" id="m-donut-arc3"
+                stroke="#F59E0B" stroke-width="13"
+                stroke-dasharray="0 263.9" stroke-dashoffset="66"
+                stroke-linecap="round" transform="rotate(-90 55 55)"/>
+            </svg>
+          </div>
+          <div class="donut-info">
+            <div class="donut-pct" id="m-pct-val">—</div>
+            <div class="donut-caption" id="m-pct-caption">transaksi via CMS</div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:var(--teal);border-radius:2px;margin-right:3px"></span>CMS</span>
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:#3B82F6;border-radius:2px;margin-right:3px"></span>Kartu Debit</span>
+              <span style="font-size:.7rem;color:var(--gray-600)"><span style="display:inline-block;width:8px;height:8px;background:#F59E0B;border-radius:2px;margin-right:3px"></span>Teller</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:160px" id="m-saran-cms"></div>
+        </div>
+      </div>
+
+      <!-- KKP SECTION -->
+      <div class="modal-section" id="m-kkp-section">
+        <div class="modal-section-title">🏷️ Kartu Kredit Pemerintah (KKP)</div>
+        <div id="m-kkp-content"></div>
+      </div>
+
+      <!-- LPJ SECTION -->
+      <div class="modal-section">
+        <div class="modal-section-title">📋 LPJ Bendahara</div>
+        <div class="modal-lpj-grid" id="m-lpj-content">
+          <div class="modal-lpj-na">Data LPJ tidak tersedia.</div>
+        </div>
+      </div>
+
+      <!-- MONTHLY INDICATORS: Gaji / PPPK / Rekon / Capaian -->
+      <div class="modal-section">
+        <div class="modal-section-title">📅 Gaji, Rekon &amp; Capaian Output</div>
+        <div class="modal-lpj-grid" id="m-monthly-content">
+          <div class="modal-lpj-na">Data belum tersedia.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- LPJ PAGE -->
+
+<script>
+const CMS_DATA = [{"kode":"008601","nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","cms":66,"debit":0,"teller":103,"total":169,"pct":39.1},{"kode":"008657","nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","cms":77,"debit":0,"teller":0,"total":77,"pct":100},{"kode":"099748","nama":"PENGADILAN NEGERI TOBELO","cms":36,"debit":0,"teller":17,"total":53,"pct":67.9},{"kode":"099749","nama":"PENGADILAN NEGERI TOBELO","cms":0,"debit":0,"teller":10,"total":10,"pct":0},{"kode":"280332","nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","cms":508,"debit":0,"teller":2,"total":510,"pct":99.6},{"kode":"280816","nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","cms":80,"debit":0,"teller":7,"total":87,"pct":92},{"kode":"280818","nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","cms":9,"debit":0,"teller":15,"total":24,"pct":37.5},{"kode":"280819","nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","cms":15,"debit":0,"teller":34,"total":49,"pct":30.6},{"kode":"280820","nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","cms":27,"debit":0,"teller":2,"total":29,"pct":93.1},{"kode":"280821","nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"280823","nama":"BADAN PUSAT STATISTIK KAB. PULAU MOROTAI","cms":704,"debit":0,"teller":23,"total":727,"pct":96.8},{"kode":"280830","nama":"POLRES PULAU MOROTAI","cms":95,"debit":0,"teller":0,"total":95,"pct":100},{"kode":"289081","nama":"DINAS TRANSMIGRASI DAN TENAGA KERJA KAB. HALMAHERA TIMUR","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"307796","nama":"PENGADILAN AGAMA MOROTAI","cms":63,"debit":0,"teller":9,"total":72,"pct":87.5},{"kode":"309102","nama":"PENGADILAN AGAMA MOROTAI","cms":14,"debit":0,"teller":3,"total":17,"pct":82.4},{"kode":"344702","nama":"LANAL MOROTAI","cms":0,"debit":0,"teller":1,"total":1,"pct":0},{"kode":"344856","nama":"LANUD LEO WATTIMENA","cms":0,"debit":0,"teller":7,"total":7,"pct":0},{"kode":"403753","nama":"DINAS PERINDUSTRIAN, PERDAGANGAN, KOPERASI DAN USAHA MIKRO KECIL MENENGAH KABUPATEN PULAU MOROTAI","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"410000","nama":"KPP PRATAMA TOBELO","cms":60,"debit":0,"teller":11,"total":71,"pct":84.5},{"kode":"413642","nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","cms":178,"debit":0,"teller":72,"total":250,"pct":71.2},{"kode":"414220","nama":"KANTOR UPBU GAMAR MALAMO","cms":53,"debit":0,"teller":4,"total":57,"pct":93},{"kode":"419280","nama":"BNN KAB. PULAU MOROTAI","cms":90,"debit":0,"teller":76,"total":166,"pct":54.2},{"kode":"429019","nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","cms":412,"debit":0,"teller":6,"total":418,"pct":98.6},{"kode":"437746","nama":"STASIUN METEOROLOGI GAMAR MALAMO","cms":6,"debit":0,"teller":0,"total":6,"pct":100},{"kode":"447899","nama":"KANTOR UPBU BULI","cms":96,"debit":0,"teller":0,"total":96,"pct":100},{"kode":"449493","nama":"KANTOR UPBU PITU","cms":110,"debit":0,"teller":13,"total":123,"pct":89.4},{"kode":"452878","nama":"KPPN TOBELO","cms":127,"debit":0,"teller":21,"total":148,"pct":85.8},{"kode":"521992","nama":"KANTOR UPBU KUABANG","cms":43,"debit":0,"teller":10,"total":53,"pct":81.1},{"kode":"559438","nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","cms":4,"debit":0,"teller":28,"total":32,"pct":12.5},{"kode":"559470","nama":"UNIT PENYELENGGARA PELABUHAN BULI","cms":125,"debit":0,"teller":0,"total":125,"pct":100},{"kode":"601330","nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","cms":34,"debit":0,"teller":5,"total":39,"pct":87.2},{"kode":"601344","nama":"MADRASAH TSANAWIYAH NEGERI 1 MOROTAI","cms":166,"debit":0,"teller":49,"total":215,"pct":77.2},{"kode":"601408","nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","cms":0,"debit":0,"teller":206,"total":206,"pct":0},{"kode":"605135","nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","cms":125,"debit":0,"teller":245,"total":370,"pct":33.8},{"kode":"650007","nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","cms":0,"debit":0,"teller":4,"total":4,"pct":0},{"kode":"655310","nama":"POLRES HALMAHERA UTARA","cms":317,"debit":0,"teller":24,"total":341,"pct":93},{"kode":"659672","nama":"KPU KABUPATEN HALMAHERA UTARA","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"659690","nama":"KPU  KABUPATEN HALMAHERA TIMUR","cms":62,"debit":0,"teller":1,"total":63,"pct":98.4},{"kode":"661892","nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","cms":1,"debit":0,"teller":15,"total":16,"pct":6.2},{"kode":"664110","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","cms":4,"debit":0,"teller":12,"total":16,"pct":25},{"kode":"664111","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","cms":0,"debit":0,"teller":15,"total":15,"pct":0},{"kode":"664112","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","cms":0,"debit":0,"teller":99,"total":99,"pct":0},{"kode":"664113","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","cms":0,"debit":0,"teller":9,"total":9,"pct":0},{"kode":"664114","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"664124","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","cms":13,"debit":0,"teller":6,"total":19,"pct":68.4},{"kode":"664125","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","cms":96,"debit":0,"teller":5,"total":101,"pct":95},{"kode":"664126","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","cms":63,"debit":0,"teller":40,"total":103,"pct":61.2},{"kode":"664127","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"664128","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","cms":17,"debit":0,"teller":0,"total":17,"pct":100},{"kode":"665751","nama":"POLRES HALMAHERA TIMUR","cms":95,"debit":0,"teller":36,"total":131,"pct":72.5},{"kode":"667524","nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","cms":1725,"debit":0,"teller":98,"total":1823,"pct":94.6},{"kode":"668732","nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","cms":870,"debit":0,"teller":8,"total":878,"pct":99.1},{"kode":"674746","nama":"MADRASAH TSANAWIYAH NEGERI 2 MOROTAI KAB. PULAU MOROTAI","cms":45,"debit":0,"teller":144,"total":189,"pct":23.8},{"kode":"674750","nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","cms":34,"debit":0,"teller":11,"total":45,"pct":75.6},{"kode":"675340","nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","cms":108,"debit":0,"teller":42,"total":150,"pct":72},{"kode":"675357","nama":"MADRASAH ALIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","cms":83,"debit":0,"teller":3,"total":86,"pct":96.5},{"kode":"680022","nama":"MADRASAH TSANAWIYAH NEGERI 3 HALMAHERA UTARA KAB. HALMAHERA UTARA","cms":19,"debit":0,"teller":0,"total":19,"pct":100},{"kode":"680739","nama":"KPU KABUPATEN KEPULAUAN MOROTAI","cms":1,"debit":0,"teller":116,"total":117,"pct":0.9},{"kode":"689403","nama":"KANTOR PERTANAHAN KABUPATEN PULAU MOROTAI","cms":236,"debit":0,"teller":11,"total":247,"pct":95.5},{"kode":"689884","nama":"BNN KABUPATEN HALMAHERA UTARA","cms":51,"debit":0,"teller":12,"total":63,"pct":81},{"kode":"690462","nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","cms":299,"debit":0,"teller":9,"total":308,"pct":97.1},{"kode":"691683","nama":"Dinas Tenaga Kerja dan Transmigrasi Kabupaten Pulau Morotai","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"691684","nama":"Dinas Tenaga Kerja an Transmigrasi Kabupaten Halmahera Utara","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"692111","nama":"LAPAS KELAS II B TOBELLO","cms":114,"debit":0,"teller":18,"total":132,"pct":86.4},{"kode":"692956","nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","cms":454,"debit":0,"teller":0,"total":454,"pct":100},{"kode":"693938","nama":"PELAKSANAAN JALAN NASIONAL WILAYAH I PROVINSI MALUKU UTARA","cms":63,"debit":0,"teller":9,"total":72,"pct":87.5},{"kode":"694632","nama":"Dinas Transmigrasi dan Tenaga Kerja Kabupaten Halmahera Timur","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"694953","nama":"BRIGIF TP 28/BARI FOLA","cms":0,"debit":0,"teller":0,"total":0,"pct":""},{"kode":"695302","nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA UTARA","cms":101,"debit":0,"teller":0,"total":101,"pct":100},{"kode":"695305","nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA TIMUR","cms":66,"debit":0,"teller":0,"total":66,"pct":100},{"kode":"695307","nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. PULAU MOROTAI","cms":80,"debit":0,"teller":12,"total":92,"pct":87}];
+
+const KKP_DATA = [{"kode":"099748","nama":"PENGADILAN NEGERI TOBELO","dom":0,"nondom":8000000,"trx":22},{"kode":"307796","nama":"PENGADILAN AGAMA MOROTAI","dom":0,"nondom":14000000,"trx":35},{"kode":"008601","nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","dom":0,"nondom":20000000,"trx":0},{"kode":"008657","nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","dom":0,"nondom":34000000,"trx":0},{"kode":"650007","nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","dom":14000000,"nondom":0,"trx":0},{"kode":"694953","nama":"BRIGIF TP 28/BARI FOLA","dom":20000000,"nondom":20000000,"trx":0},{"kode":"410000","nama":"KANTOR PELAYANAN PAJAK PRATAMA TOBELO","dom":2000000,"nondom":30000000,"trx":4},{"kode":"452878","nama":"KANTOR PELAYANAN PERBENDAHARAAN NEGARA TOBELO","dom":0,"nondom":20000000,"trx":67},{"kode":"413642","nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","dom":0,"nondom":10000000,"trx":39},{"kode":"414220","nama":"KANTOR UPBU GAMAR MALAMO","dom":0,"nondom":20000000,"trx":0},{"kode":"447899","nama":"KANTOR UPBU BULI","dom":0,"nondom":20000000,"trx":0},{"kode":"449493","nama":"KANTOR UPBU PITU","dom":0,"nondom":22800000,"trx":24},{"kode":"521992","nama":"KANTOR UPBU KUABANG","dom":34000000,"nondom":0,"trx":0},{"kode":"559438","nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","dom":16000000,"nondom":0,"trx":0},{"kode":"559470","nama":"UNIT PENYELENGGARA PELABUHAN BULI","dom":0,"nondom":10000000,"trx":2},{"kode":"661892","nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","dom":0,"nondom":13340000,"trx":0},{"kode":"664112","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","dom":0,"nondom":24000000,"trx":0},{"kode":"664124","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","dom":0,"nondom":10000000,"trx":0},{"kode":"664125","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","dom":0,"nondom":13400000,"trx":0},{"kode":"664126","nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","dom":0,"nondom":6800000,"trx":0},{"kode":"675340","nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","dom":0,"nondom":13400000,"trx":0},{"kode":"280823","nama":"Badan Pusat Statistik Kab. Pulau Morotai","dom":8000000,"nondom":0,"trx":26},{"kode":"280823","nama":"Badan Pusat Statistik Kab. Pulau Morotai","dom":4000000,"nondom":0,"trx":26},{"kode":"667524","nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","dom":20000000,"nondom":0,"trx":8},{"kode":"668732","nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","dom":0,"nondom":26800000,"trx":15},{"kode":"280332","nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","dom":0,"nondom":8000000,"trx":14},{"kode":"429019","nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","dom":0,"nondom":6000000,"trx":0},{"kode":"689403","nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","dom":6000000,"nondom":0,"trx":0},{"kode":"280830","nama":"POLRES PULAU MOROTAI","dom":0,"nondom":60000000,"trx":4},{"kode":"655310","nama":"POLRES HALMAHERA UTARA","dom":0,"nondom":60000000,"trx":0},{"kode":"665751","nama":"POLRES HALMAHERA TIMUR","dom":0,"nondom":66000000,"trx":0},{"kode":"690462","nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","dom":0,"nondom":20000000,"trx":41},{"kode":"419280","nama":"BADAN NARKOTIKA NASIONAL KABUPATEN PULAU MOROTAI","dom":0,"nondom":13600000,"trx":0},{"kode":"659672","nama":"KPU KABUPATEN HALMAHERA UTARA","dom":0,"nondom":8000000,"trx":3},{"kode":"659690","nama":"KPU KABUPATEN HALMAHERA TIMUR","dom":4000000,"nondom":0,"trx":0},{"kode":"680739","nama":"KPU KABUPATEN KEPULAUAN MOROTAI","dom":0,"nondom":8000000,"trx":3},{"kode":"692111","nama":"LAPAS KELAS II B TOBELLO","dom":0,"nondom":20000000,"trx":38},{"kode":"692956","nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","dom":8000000,"nondom":0,"trx":3},{"kode":"693938","nama":"PELAKSANAAN JALAN NASIONAL WILAYAH I PROVINSI MALUKU UTARA","dom":0,"nondom":8000000,"trx":3}];
+
+const LPJ_DATA = {"280332":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":3,"03":1,"04":4,"05":2,"06":6,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"280816":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":10,"02":9,"03":7,"04":8,"05":9,"06":10,"07":9},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"280818":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":9,"02":6,"03":10,"04":8,"05":9,"06":10,"07":9},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"280819":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":9,"02":6,"03":10,"04":8,"05":10,"06":10,"07":9},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"280820":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":10,"02":9,"03":7,"04":8,"05":9,"06":6,"07":5},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"280823":{"nama":"Badan Pusat Statistik Kab. Pulau Morotai","pengeluaran":{"bulan":{"01":10,"02":10,"03":9,"04":7,"05":9,"06":9,"07":6},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"280830":{"nama":"POLRES PULAU MOROTAI","penerimaan":{"bulan":{"01":7,"02":10,"03":9,"04":6,"05":9,"06":9,"07":7},"rata2":8,"klasifikasi":"Lambat","terlambat":0},"pengeluaran":{"bulan":{"01":7,"02":7,"03":1,"04":4,"05":9,"06":9,"07":7},"rata2":6,"klasifikasi":"Normal","terlambat":0}},"307796":{"nama":"PENGADILAN AGAMA MOROTAI","pengeluaran":{"bulan":{"01":4,"02":5,"03":2,"04":6,"05":4,"06":3,"07":4},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"309102":{"nama":"PENGADILAN AGAMA MOROTAI","penerimaan":{"bulan":{"01":5,"02":10,"03":2,"04":6,"05":2,"06":2,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0},"pengeluaran":{"bulan":{"01":4,"02":5,"03":2,"04":6,"05":4,"06":3,"07":4},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"344702":{"nama":"LANAL MOROTAI","pengeluaran":{"bulan":{"01":10,"02":5,"03":8,"04":6,"05":9,"06":9,"07":5},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"344856":{"nama":"LANUD LEO WATTIMENA","pengeluaran":{"bulan":{"01":10,"02":2,"03":1,"04":5,"05":3,"06":7,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"410000":{"nama":"KANTOR PELAYANAN PAJAK PRATAMA TOBELO","pengeluaran":{"bulan":{"01":5,"02":2,"03":8,"04":7,"05":9,"06":1,"07":3},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"413642":{"nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","penerimaan":{"bulan":{"01":11,"02":6,"03":9,"04":10,"05":8,"06":9,"07":6},"rata2":8,"klasifikasi":"Lambat","terlambat":1},"pengeluaran":{"bulan":{"01":4,"02":12,"03":2,"04":5,"05":2,"06":2,"07":4},"rata2":4,"klasifikasi":"Cepat","terlambat":1}},"414220":{"nama":"KANTOR UPBU GAMAR MALAMO","penerimaan":{"bulan":{"01":5,"02":3,"03":6,"04":7,"05":8,"06":2,"07":9},"rata2":6,"klasifikasi":"Normal","terlambat":0},"pengeluaran":{"bulan":{"01":9,"02":9,"03":10,"04":8,"05":5,"06":8,"07":5},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"419280":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":10,"02":9,"03":6,"04":6,"05":3,"06":6,"07":10},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"429019":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":2,"02":2,"03":8,"04":6,"05":4,"06":2,"07":5},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"437746":{"nama":"STASIUN METEOROLOGI GAMAR MALAMO","pengeluaran":{"bulan":{"01":9,"02":6,"03":7,"04":8,"05":9,"06":6,"07":7},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"447899":{"nama":"KANTOR UPBU BULI","pengeluaran":{"bulan":{"01":3,"02":4,"03":2,"04":5,"05":3,"06":2,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"449493":{"nama":"KANTOR UPBU PITU","penerimaan":{"bulan":{"01":2,"02":2,"03":3,"04":4,"05":3,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0},"pengeluaran":{"bulan":{"01":2,"02":2,"03":2,"04":4,"05":2,"06":1,"07":3},"rata2":2,"klasifikasi":"Cepat","terlambat":0}},"452878":{"nama":"KPPN TOBELO","pengeluaran":{"bulan":{"01":4,"02":2,"03":1,"04":4,"05":3,"06":2,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"521992":{"nama":"KANTOR UPBU KUABANG","penerimaan":{"bulan":{"01":2,"02":4,"03":2,"04":6,"05":4,"06":6,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0},"pengeluaran":{"bulan":{"01":5,"02":2,"03":2,"04":5,"05":5,"06":6,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"559438":{"nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","penerimaan":{"bulan":{"01":6,"02":5,"03":2,"04":5,"05":8,"06":7,"07":6},"rata2":6,"klasifikasi":"Normal","terlambat":0},"pengeluaran":{"bulan":{"01":10,"02":10,"03":9,"04":7,"05":9,"06":9,"07":7},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"559470":{"nama":"UNIT PENYELENGGARA PELABUHAN BULI","penerimaan":{"bulan":{"01":6,"02":3,"03":7,"04":6,"05":8,"06":6,"07":6},"rata2":6,"klasifikasi":"Normal","terlambat":0},"pengeluaran":{"bulan":{"01":4,"02":9,"03":7,"04":5,"05":9,"06":10,"07":4},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"601330":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":9,"03":10,"04":8,"05":9,"06":9,"07":8},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"601344":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 MOROTAI","pengeluaran":{"bulan":{"01":10,"02":10,"03":7,"04":8,"05":9,"06":6,"07":5},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"601408":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":8,"03":12,"04":10,"05":10,"06":9,"07":8},"rata2":9,"klasifikasi":"Lambat","terlambat":1}},"605135":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":9,"03":6,"04":8,"05":9,"06":2,"07":4},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"650007":{"nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":2,"02":6,"03":6,"04":7,"05":4,"06":6,"07":7},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"655310":{"nama":"POLRES HALMAHERA UTARA","penerimaan":{"bulan":{"01":10,"02":10,"03":10,"04":8,"05":9,"06":6,"07":10},"rata2":9,"klasifikasi":"Lambat","terlambat":0},"pengeluaran":{"bulan":{"01":3,"02":2,"03":6,"04":4,"05":2,"06":3,"07":4},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"659672":{"nama":"KPU  KABUPATEN HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":2,"03":2,"04":1,"05":1,"06":1,"07":1},"rata2":2,"klasifikasi":"Cepat","terlambat":0}},"659690":{"nama":"KPU  KABUPATEN HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":3,"02":2,"03":13,"04":8,"05":2,"06":2,"07":2},"rata2":5,"klasifikasi":"Normal","terlambat":1}},"661892":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":2,"03":2,"05":2,"06":1,"07":4},"rata2":2,"klasifikasi":"Cepat","terlambat":0}},"664110":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":6,"03":10,"04":8,"05":9,"06":7,"07":10},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"664111":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":4,"02":4,"03":9,"04":5,"05":8,"06":10,"07":6},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"664112":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":3,"02":10,"03":10,"04":10,"05":8,"07":3},"rata2":7,"klasifikasi":"Normal","terlambat":0}},"664113":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":6,"02":5,"03":14,"04":8,"05":10,"06":7,"07":6},"rata2":8,"klasifikasi":"Lambat","terlambat":1}},"664124":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":9,"02":4,"03":8,"04":6,"05":2,"06":2,"07":5},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"664125":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":4,"02":3,"03":1,"04":5,"05":2,"06":2,"07":4},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"664126":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":10,"02":6,"03":10,"04":8,"05":3,"06":8,"07":10},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"664128":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":4,"02":5,"03":2,"04":4,"05":3,"06":1,"07":4},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"665751":{"nama":"POLRES HALMAHERA TIMUR","penerimaan":{"bulan":{"01":5,"02":6,"03":7,"04":3,"05":10,"06":7,"07":5},"rata2":6,"klasifikasi":"Normal","terlambat":0},"pengeluaran":{"bulan":{"01":3,"03":6,"04":2,"05":5,"06":1,"07":4},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"667524":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":2,"02":2,"03":6,"04":4,"05":3,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"668732":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":2,"02":2,"03":6,"04":4,"05":2,"06":3,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"674746":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 MOROTAI KAB. PULAU MOROTAI","pengeluaran":{"bulan":{"01":10,"02":6,"03":14,"04":8,"05":9,"07":9},"rata2":9,"klasifikasi":"Lambat","terlambat":1}},"674750":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":9,"02":5,"03":6,"04":4,"05":9,"06":3,"07":6},"rata2":6,"klasifikasi":"Normal","terlambat":0}},"675340":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"01":9,"02":6,"03":10,"04":8,"05":3,"06":10,"07":10},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"675357":{"nama":"MADRASAH ALIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":2,"02":6,"03":1,"04":8,"05":2,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"680022":{"nama":"MADRASAH TSANAWIYAH NEGERI 3 HALMAHERA UTARA KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"01":9,"02":9,"03":9,"04":7,"05":9,"06":7,"07":6},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"680739":{"nama":"KPU KABUPATEN KEPULAUAN MOROTAI","pengeluaran":{"bulan":{"01":10,"02":2,"03":10,"04":2,"05":2,"06":2,"07":4},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"689403":{"nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","pengeluaran":{"bulan":{"01":9,"02":2,"03":13,"04":8,"05":9,"06":8,"07":10},"rata2":8,"klasifikasi":"Lambat","terlambat":1}},"689884":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN HALMAHERA UTARA","penerimaan":{"bulan":{"01":10,"02":11,"03":14,"04":8,"05":10,"06":9,"07":10},"rata2":10,"klasifikasi":"Lambat","terlambat":2},"pengeluaran":{"bulan":{"01":10,"02":6,"03":9,"04":8,"05":9,"06":8,"07":10},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"690462":{"nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","pengeluaran":{"bulan":{"01":9,"02":2,"03":1,"04":4,"05":2,"06":6,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"692111":{"nama":"LAPAS KELAS II B TOBELLO","pengeluaran":{"bulan":{"01":5,"02":2,"03":1,"04":2,"05":1,"06":1,"07":3},"rata2":2,"klasifikasi":"Cepat","terlambat":0}},"692956":{"nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","pengeluaran":{"bulan":{"01":10,"02":9,"03":1,"04":4,"05":2,"06":3,"07":3},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"693938":{"nama":"PELAKSANAAN JALAN NASIONAL WILAYAH I PROVINSI MALUKU UTARA","pengeluaran":{"bulan":{"01":2,"02":5,"03":2,"04":4,"05":3,"06":8,"07":3},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"694953":{"nama":"BRIGIF TP 28/BARI FOLA","pengeluaran":{"bulan":{"01":10,"02":2,"03":2,"04":4,"05":3,"06":1,"07":4},"rata2":4,"klasifikasi":"Cepat","terlambat":0}},"695302":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA UTARA","pengeluaran":{"bulan":{"04":6,"05":1,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat","terlambat":0}},"695305":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA TIMUR","pengeluaran":{"bulan":{"04":8,"05":8,"06":1,"07":4},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"695307":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. PULAU MOROTAI","pengeluaran":{"bulan":{"04":8,"05":9,"06":9,"07":6},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"008601":{"nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","penerimaan":{"bulan":{"01":11,"02":9,"03":10,"04":7,"05":4,"06":7,"07":7},"rata2":8,"klasifikasi":"Lambat","terlambat":1},"pengeluaran":{"bulan":{"01":3,"02":1,"03":10,"04":8,"05":3,"06":2,"07":5},"rata2":5,"klasifikasi":"Normal","terlambat":0}},"099749":{"nama":"PENGADILAN NEGERI TOBELO","penerimaan":{"bulan":{"01":10,"02":10,"03":8,"04":7,"05":8,"06":7,"07":7},"rata2":8,"klasifikasi":"Lambat","terlambat":0},"pengeluaran":{"bulan":{"01":10,"02":9,"03":10,"04":7,"05":9,"06":6,"07":7},"rata2":8,"klasifikasi":"Lambat","terlambat":0}},"008657":{"nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","pengeluaran":{"bulan":{"01":10,"02":10,"03":9,"04":8,"05":9,"06":9,"07":7},"rata2":9,"klasifikasi":"Lambat","terlambat":0}},"099748":{"nama":"PENGADILAN NEGERI TOBELO","pengeluaran":{"bulan":{"01":10,"02":9,"03":10,"04":7,"05":9,"06":6,"07":6},"rata2":8,"klasifikasi":"Lambat","terlambat":0}}};
+
+const GAJI_DATA = {"280332":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","bulan":{"01":10,"02":9,"03":4,"04":5,"05":13,"06":8,"07":8,"08":7,"09":7},"rata2":8,"klasifikasi":"Normal"},"280823":{"nama":"Badan Pusat Statistik Kab. Pulau Morotai","bulan":{"01":10,"02":13,"03":11,"04":11,"05":10,"06":11,"07":10,"08":9,"09":12},"rata2":11,"klasifikasi":"Normal"},"280830":{"nama":"POLRES PULAU MOROTAI","bulan":{"01":10,"02":13,"03":4,"04":4,"05":6,"06":6,"07":8,"08":8,"09":4},"rata2":7,"klasifikasi":"Normal"},"307796":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"01":8,"02":13,"03":10,"04":10,"05":7,"06":6,"07":10,"08":7,"09":6},"rata2":9,"klasifikasi":"Normal"},"344702":{"nama":"LANAL MOROTAI","bulan":{"01":12,"02":7,"03":11,"04":10,"05":10,"06":11,"07":10,"08":10,"09":10},"rata2":10,"klasifikasi":"Normal"},"344856":{"nama":"LANUD LEO WATTIMENA","bulan":{"01":9,"02":15,"03":11,"04":12,"05":14,"06":13,"07":10,"08":14,"09":13},"rata2":12,"klasifikasi":"Normal"},"413642":{"nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","bulan":{"01":11,"02":14,"03":9,"04":4,"05":8,"06":11,"07":3,"08":7,"09":7},"rata2":8,"klasifikasi":"Normal"},"414220":{"nama":"KANTOR UPBU GAMAR MALAMO","bulan":{"01":11,"02":14,"03":11,"04":9,"05":10,"06":13,"07":10,"08":10,"09":12},"rata2":11,"klasifikasi":"Normal"},"429019":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","bulan":{"01":10,"02":7,"03":10,"04":3,"05":14,"06":11,"07":8,"08":14,"09":10},"rata2":10,"klasifikasi":"Normal"},"447899":{"nama":"KANTOR UPBU BULI","bulan":{"01":11,"02":14,"03":5,"04":9,"05":8,"06":11,"07":9,"08":9,"09":7},"rata2":9,"klasifikasi":"Normal"},"449493":{"nama":"KANTOR UPBU PITU","bulan":{"01":8,"02":13,"03":4,"04":9,"05":8,"06":8,"07":4,"08":7,"09":7},"rata2":8,"klasifikasi":"Normal"},"521992":{"nama":"KANTOR UPBU KUABANG","bulan":{"01":11,"02":9,"03":4,"04":5,"05":8,"06":11,"07":10,"08":10,"09":10},"rata2":9,"klasifikasi":"Normal"},"559438":{"nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","bulan":{"01":10,"02":9,"03":9,"04":9,"05":13,"06":11,"07":10,"08":13,"09":11},"rata2":11,"klasifikasi":"Normal"},"559470":{"nama":"UNIT PENYELENGGARA PELABUHAN BULI","bulan":{"01":9,"02":12,"03":6,"04":9,"05":14,"06":12,"07":10,"08":13,"09":12},"rata2":11,"klasifikasi":"Normal"},"650007":{"nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","bulan":{"01":8,"02":7,"03":3,"04":3,"05":6,"06":6,"07":9,"08":7,"09":5},"rata2":6,"klasifikasi":"Cepat"},"655310":{"nama":"POLRES HALMAHERA UTARA","bulan":{"01":8,"02":8,"03":4,"04":4,"05":2,"06":12,"07":5,"08":2,"09":12},"rata2":6,"klasifikasi":"Cepat"},"659672":{"nama":"KPU KABUPATEN HALMAHERA UTARA","bulan":{"01":10,"02":14,"03":9,"04":11,"05":9,"06":11,"07":11,"08":3,"09":12},"rata2":10,"klasifikasi":"Normal"},"659690":{"nama":"KPU KABUPATEN HALMAHERA TIMUR","bulan":{"01":8,"02":12,"03":3,"04":4,"05":2,"06":11,"07":4,"08":3,"09":4},"rata2":6,"klasifikasi":"Cepat"},"665751":{"nama":"POLRES HALMAHERA TIMUR","bulan":{"01":9,"02":12,"03":9,"04":12,"05":13,"06":11,"07":10,"08":8,"09":12},"rata2":11,"klasifikasi":"Normal"},"667524":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","bulan":{"01":10,"02":13,"03":11,"04":4,"05":14,"06":7,"07":12,"08":3,"09":7},"rata2":9,"klasifikasi":"Normal"},"668732":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","bulan":{"01":8,"02":8,"03":4,"04":3,"05":8,"06":11,"07":4,"08":7,"09":4},"rata2":6,"klasifikasi":"Cepat"},"680739":{"nama":"KPU KABUPATEN KEPULAUAN MOROTAI","bulan":{"01":11,"02":15,"03":10,"04":9,"05":14,"06":11,"07":9,"08":10,"09":10},"rata2":11,"klasifikasi":"Normal"},"689403":{"nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","bulan":{"01":11,"02":14,"03":11,"04":3,"05":14,"06":11,"07":11,"08":9,"09":11},"rata2":11,"klasifikasi":"Normal"},"690462":{"nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","bulan":{"01":10,"02":7,"03":6,"04":5,"05":9,"06":8,"07":10,"08":6,"09":11},"rata2":8,"klasifikasi":"Normal"},"692111":{"nama":"LAPAS KELAS II B TOBELLO","bulan":{"01":9,"02":12,"03":9,"04":10,"05":7,"06":7,"07":10,"08":8,"09":7},"rata2":9,"klasifikasi":"Normal"},"692956":{"nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","bulan":{"01":8,"02":14,"03":12,"04":11,"05":7,"06":11,"07":8,"08":7,"09":12},"rata2":10,"klasifikasi":"Normal"},"694953":{"nama":"BRIGIF TP 28/BARI FOLA","bulan":{"05":15,"06":11,"07":5,"08":10,"09":11},"rata2":10,"klasifikasi":"Normal"},"008601":{"nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","bulan":{"01":10,"02":13,"03":5,"04":10,"05":9,"06":11,"07":8,"08":6,"09":11},"rata2":9,"klasifikasi":"Normal"},"008657":{"nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","bulan":{"01":9,"02":9,"03":11,"04":5,"05":9,"06":6,"07":4,"08":13,"09":11},"rata2":9,"klasifikasi":"Normal"},"099748":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"01":10,"02":14,"03":9,"04":10,"05":14,"06":11,"07":10,"08":8,"09":10},"rata2":11,"klasifikasi":"Normal"}};
+const PPPK_DATA = {"280332":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","bulan":{"01":12,"02":9,"03":4,"04":4,"05":13,"06":8,"07":8,"08":7,"09":7},"rata2":8,"klasifikasi":"Normal"},"280823":{"nama":"Badan Pusat Statistik Kab. Pulau Morotai","bulan":{"01":11,"02":13,"03":9,"04":11,"05":14,"06":11,"07":10,"08":9,"09":12},"rata2":11,"klasifikasi":"Normal"},"307796":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"01":8,"02":13,"03":10,"04":10,"05":7,"06":6,"07":9,"08":7,"09":6},"rata2":8,"klasifikasi":"Normal"},"413642":{"nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","bulan":{"01":12,"02":14,"03":9,"04":5,"05":8,"06":11,"07":9,"08":7,"09":12},"rata2":10,"klasifikasi":"Normal"},"414220":{"nama":"KANTOR UPBU GAMAR MALAMO","bulan":{"03":12,"04":10,"05":9,"06":12,"07":10,"08":10,"09":12},"rata2":11,"klasifikasi":"Normal"},"429019":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","bulan":{"01":11,"02":7,"03":10,"04":3,"05":14,"06":7,"07":8,"08":13,"09":6},"rata2":9,"klasifikasi":"Normal"},"447899":{"nama":"KANTOR UPBU BULI","bulan":{"03":5,"04":9,"05":8,"06":11,"07":9,"08":9,"09":7},"rata2":8,"klasifikasi":"Normal"},"449493":{"nama":"KANTOR UPBU PITU","bulan":{"01":8,"02":13,"03":4,"04":9,"05":8,"06":8,"07":4,"08":8,"09":13},"rata2":8,"klasifikasi":"Normal"},"521992":{"nama":"KANTOR UPBU KUABANG","bulan":{"02":13,"03":5,"04":5,"05":7,"06":11,"07":10,"08":10,"09":10},"rata2":9,"klasifikasi":"Normal"},"559438":{"nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","bulan":{"01":10,"02":9,"03":9,"04":9,"05":13,"07":15,"08":13,"09":11},"rata2":11,"klasifikasi":"Normal"},"559470":{"nama":"UNIT PENYELENGGARA PELABUHAN BULI","bulan":{"02":12,"03":6,"04":10,"05":14,"06":12,"07":10,"08":14,"09":12},"rata2":11,"klasifikasi":"Normal"},"659672":{"nama":"KPU KABUPATEN HALMAHERA UTARA","bulan":{"01":10,"03":9,"04":11,"05":9,"06":11,"07":11,"08":3,"09":12},"rata2":10,"klasifikasi":"Normal"},"659690":{"nama":"KPU KABUPATEN HALMAHERA TIMUR","bulan":{"01":8,"02":12,"03":3,"04":4,"05":7,"06":7,"07":4,"08":3,"09":6},"rata2":6,"klasifikasi":"Cepat"},"667524":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","bulan":{"01":10,"02":15,"03":11,"04":4,"05":14,"06":8,"07":12,"08":3,"09":7},"rata2":9,"klasifikasi":"Normal"},"668732":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","bulan":{"02":8,"03":4,"04":3,"05":8,"06":11,"07":4,"08":7,"09":10},"rata2":7,"klasifikasi":"Normal"},"680739":{"nama":"KPU KABUPATEN KEPULAUAN MOROTAI","bulan":{"01":11,"02":15,"03":10,"04":9,"05":14,"06":11,"07":9,"08":10,"09":10},"rata2":11,"klasifikasi":"Normal"},"689403":{"nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","bulan":{"01":12,"02":15,"03":11,"04":3,"05":14,"06":11,"07":10,"08":9,"09":11},"rata2":11,"klasifikasi":"Normal"},"690462":{"nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","bulan":{"02":15,"03":9,"04":5,"05":9,"06":8,"07":10,"08":6,"09":11},"rata2":9,"klasifikasi":"Normal"},"099748":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"01":10,"02":14,"04":10,"05":14,"06":11,"07":10,"08":8,"09":10},"rata2":11,"klasifikasi":"Normal"}};
+const REKON_DATA = {"280332":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","bulan":{"01":11,"02":16,"03":13,"04":12,"05":15,"06":21,"07":14},"rata2":15,"klasifikasi":"Lambat"},"280816":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"01":18,"02":31,"03":14,"04":12,"05":10,"06":15,"07":11},"rata2":16,"klasifikasi":"Lambat"},"280818":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"01":26,"02":28,"03":14,"04":12,"05":10,"06":16,"07":11},"rata2":17,"klasifikasi":"Lambat"},"280819":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"01":18,"02":28,"03":13,"04":12,"05":10,"06":16,"07":11},"rata2":15,"klasifikasi":"Lambat"},"280820":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"01":11,"02":31,"03":13,"04":12,"05":10,"06":20,"07":11},"rata2":15,"klasifikasi":"Lambat"},"280823":{"nama":"Badan Pusat Statistik Kab. Pulau Morotai","bulan":{"01":11,"02":26,"03":13,"04":12,"05":14,"06":20,"07":12},"rata2":15,"klasifikasi":"Lambat"},"280830":{"nama":"POLRES PULAU MOROTAI","bulan":{"01":11,"02":17,"03":13,"04":12,"05":13,"06":15,"07":12},"rata2":13,"klasifikasi":"Lambat"},"307796":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"01":18,"02":25,"03":13,"04":11,"05":11,"06":17,"07":13},"rata2":15,"klasifikasi":"Lambat"},"309102":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"01":18,"02":25,"03":13,"04":12,"05":11,"06":17,"07":13},"rata2":16,"klasifikasi":"Lambat"},"344702":{"nama":"LANAL MOROTAI","bulan":{"01":18,"02":13,"03":14,"04":12,"05":13,"06":18,"07":13},"rata2":14,"klasifikasi":"Lambat"},"344856":{"nama":"LANUD LEO WATTIMENA","bulan":{"01":18,"02":16,"03":15,"04":13,"05":14,"06":17,"07":13},"rata2":15,"klasifikasi":"Lambat"},"410000":{"nama":"KANTOR PELAYANAN PAJAK PRATAMA TOBELO","bulan":{"01":23,"02":27,"03":15,"04":13,"05":13,"06":16,"07":13},"rata2":17,"klasifikasi":"Lambat"},"413642":{"nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","bulan":{"01":18,"02":25,"03":9,"04":13,"05":15,"06":21,"07":11},"rata2":16,"klasifikasi":"Lambat"},"414220":{"nama":"KANTOR UPBU GAMAR MALAMO","bulan":{"01":11,"02":30,"03":14,"04":13,"05":15,"06":16,"07":13},"rata2":16,"klasifikasi":"Lambat"},"419280":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN PULAU MOROTAI","bulan":{"01":25,"02":26,"03":14,"04":13,"05":15,"06":16,"07":13},"rata2":17,"klasifikasi":"Lambat"},"429019":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","bulan":{"01":25,"02":17,"03":13,"04":11,"05":11,"06":21,"07":13},"rata2":16,"klasifikasi":"Lambat"},"437746":{"nama":"STASIUN METEOROLOGI GAMAR MALAMO","bulan":{"01":18,"02":26,"03":13,"04":12,"05":15,"06":13,"07":12},"rata2":16,"klasifikasi":"Lambat"},"447899":{"nama":"KANTOR UPBU BULI","bulan":{"01":11,"02":27,"03":14,"04":12,"05":9,"06":15,"07":13},"rata2":14,"klasifikasi":"Lambat"},"449493":{"nama":"KANTOR UPBU PITU","bulan":{"01":18,"02":17,"03":10,"04":12,"05":9,"06":15,"07":13},"rata2":13,"klasifikasi":"Lambat"},"452878":{"nama":"KANTOR PELAYANAN PERBENDAHARAAN NEGARA TOBELO","bulan":{"01":18,"02":12,"03":14,"04":12,"05":8,"06":17,"07":13},"rata2":13,"klasifikasi":"Lambat"},"500239":{"nama":"KPPN TOBELO PENYALUR DANA TRANSFER UMUM","bulan":{"01":11,"02":13,"03":14,"04":8,"05":12,"06":17,"07":14},"rata2":13,"klasifikasi":"Lambat"},"521992":{"nama":"KANTOR UPBU KUABANG","bulan":{"01":11,"02":30,"03":14,"04":13,"05":15,"06":15,"07":13},"rata2":16,"klasifikasi":"Lambat"},"559438":{"nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","bulan":{"01":18,"02":31,"03":15,"04":13,"05":12,"06":19,"07":11},"rata2":17,"klasifikasi":"Lambat"},"559470":{"nama":"UNIT PENYELENGGARA PELABUHAN BULI","bulan":{"01":18,"02":16,"03":14,"04":12,"05":12,"06":20,"07":12},"rata2":15,"klasifikasi":"Lambat"},"600175":{"nama":"KPPN TOBELO PENYALUR DANA TRANSFER KHUSUS","bulan":{"01":11,"02":13,"03":14,"04":12,"05":12,"06":17,"07":14},"rata2":13,"klasifikasi":"Lambat"},"601330":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"01":18,"02":31,"03":14,"04":12,"05":9,"06":18,"07":13},"rata2":16,"klasifikasi":"Lambat"},"601344":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 MOROTAI","bulan":{"01":18,"02":31,"03":14,"04":12,"05":10,"06":20,"07":13},"rata2":17,"klasifikasi":"Lambat"},"601408":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"01":18,"02":31,"03":14,"04":12,"05":8,"06":18,"07":13},"rata2":16,"klasifikasi":"Lambat"},"605135":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"01":11,"02":17,"03":13,"04":12,"05":9,"06":20,"07":13},"rata2":14,"klasifikasi":"Lambat"},"650007":{"nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","bulan":{"01":11,"02":31,"03":13,"04":12,"05":8,"06":22,"07":10},"rata2":15,"klasifikasi":"Lambat"},"655310":{"nama":"POLRES HALMAHERA UTARA","bulan":{"01":11,"02":25,"03":13,"04":12,"05":9,"06":15,"07":12},"rata2":14,"klasifikasi":"Lambat"},"659672":{"nama":"KPU KABUPATEN HALMAHERA UTARA","bulan":{"01":18,"02":26,"03":13,"04":13,"05":15,"06":20,"07":13},"rata2":17,"klasifikasi":"Lambat"},"659690":{"nama":"KPU KABUPATEN HALMAHERA TIMUR","bulan":{"01":18,"02":17,"03":13,"04":11,"05":9,"06":13,"07":11},"rata2":13,"klasifikasi":"Lambat"},"661892":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"01":18,"02":10,"03":13,"04":12,"05":5,"06":15,"07":7},"rata2":11,"klasifikasi":"Normal"},"664110":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"01":26,"02":31,"03":14,"04":12,"05":7,"06":19,"07":13},"rata2":17,"klasifikasi":"Lambat"},"664111":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"01":26,"02":27,"03":14,"04":12,"05":14,"06":20,"07":13},"rata2":18,"klasifikasi":"Lambat"},"664112":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"01":11,"02":27,"03":15,"04":12,"05":11,"06":20,"07":13},"rata2":16,"klasifikasi":"Lambat"},"664113":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"01":11,"02":27,"03":14,"04":12,"05":11,"06":20,"07":13},"rata2":15,"klasifikasi":"Lambat"},"664124":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"01":19,"02":29,"03":13,"04":11,"05":12,"06":18,"07":12},"rata2":16,"klasifikasi":"Lambat"},"664125":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"01":11,"02":16,"03":15,"04":12,"05":13,"06":13,"07":14},"rata2":13,"klasifikasi":"Lambat"},"664126":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"01":11,"02":31,"03":14,"04":12,"05":11,"06":17,"07":12},"rata2":15,"klasifikasi":"Lambat"},"664128":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"01":11,"02":31,"03":13,"04":12,"05":10,"06":18,"07":11},"rata2":15,"klasifikasi":"Lambat"},"665751":{"nama":"POLRES HALMAHERA TIMUR","bulan":{"01":18,"02":16,"03":13,"04":12,"05":8,"06":16,"07":12},"rata2":14,"klasifikasi":"Lambat"},"667524":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","bulan":{"01":18,"02":17,"03":13,"04":12,"05":12,"06":17,"07":13},"rata2":15,"klasifikasi":"Lambat"},"668732":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","bulan":{"01":11,"02":17,"03":14,"04":12,"05":13,"06":20,"07":13},"rata2":14,"klasifikasi":"Lambat"},"674746":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 MOROTAI KAB. PULAU MOROTAI","bulan":{"01":18,"02":27,"03":13,"04":12,"05":10,"06":17,"07":12},"rata2":16,"klasifikasi":"Lambat"},"674750":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"01":20,"02":27,"03":13,"04":12,"05":11,"06":20,"07":12},"rata2":16,"klasifikasi":"Lambat"},"675340":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"01":18,"02":31,"03":14,"04":12,"05":11,"06":17,"07":12},"rata2":16,"klasifikasi":"Lambat"},"675357":{"nama":"MADRASAH ALIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"01":18,"02":9,"03":12,"04":11,"05":11,"06":14,"07":13},"rata2":13,"klasifikasi":"Lambat"},"680022":{"nama":"MADRASAH TSANAWIYAH NEGERI 3 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"01":18,"02":30,"03":15,"04":12,"05":9,"06":19,"07":13},"rata2":17,"klasifikasi":"Lambat"},"680739":{"nama":"KPU KABUPATEN KEPULAUAN MOROTAI","bulan":{"01":18,"02":17,"03":14,"04":12,"05":14,"06":21,"07":12},"rata2":15,"klasifikasi":"Lambat"},"689403":{"nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","bulan":{"01":25,"02":17,"03":12,"04":11,"05":11,"06":20,"07":14},"rata2":16,"klasifikasi":"Lambat"},"689884":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN HALMAHERA UTARA","bulan":{"01":18,"02":30,"03":14,"04":13,"05":12,"06":16,"07":14},"rata2":17,"klasifikasi":"Lambat"},"690462":{"nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","bulan":{"01":18,"02":27,"03":14,"04":13,"05":12,"06":17,"07":12},"rata2":16,"klasifikasi":"Lambat"},"691683":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KABUPATEN PULAU MOROTAI","bulan":{"01":11,"02":31,"03":15,"04":13,"05":12,"06":20,"07":12},"rata2":16,"klasifikasi":"Lambat"},"691684":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KABUPATEN HALMAHERA UTARA","bulan":{"01":11,"04":12,"05":15,"06":21,"07":12},"rata2":14,"klasifikasi":"Lambat"},"692111":{"nama":"LAPAS KELAS II B TOBELLO","bulan":{"01":11,"02":17,"03":13,"04":12,"05":13,"06":14,"07":13},"rata2":13,"klasifikasi":"Lambat"},"692956":{"nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","bulan":{"01":18,"02":30,"03":10,"04":11,"05":15,"06":17,"07":14},"rata2":16,"klasifikasi":"Lambat"},"693938":{"nama":"PELAKSANAAN JALAN NASIONAL WILAYAH I PROVINSI MALUKU UTARA","bulan":{"01":18,"02":26,"03":13,"04":11,"05":11,"06":15,"07":13},"rata2":15,"klasifikasi":"Lambat"},"694632":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KAB. HALMAHERA TIMUR","bulan":{"01":11,"02":31,"03":14,"04":13,"05":15,"06":21,"07":14},"rata2":17,"klasifikasi":"Lambat"},"694953":{"nama":"BRIGIF TP 28/BARI FOLA","bulan":{"01":11,"02":27,"03":13,"04":10,"05":13,"06":13,"07":6},"rata2":13,"klasifikasi":"Lambat"},"695302":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA UTARA","bulan":{"03":15,"04":13,"05":15,"06":18,"07":12},"rata2":15,"klasifikasi":"Lambat"},"695305":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA TIMUR","bulan":{"03":14,"04":12,"05":15,"06":17,"07":13},"rata2":14,"klasifikasi":"Lambat"},"695307":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. PULAU MOROTAI","bulan":{"03":15,"04":12,"05":12,"06":16,"07":12},"rata2":13,"klasifikasi":"Lambat"},"700358":{"nama":"KPPN TOBELO PENYALUR DANA DESA, INSENTIF FISKAL, OTONOMI KHUSUS DAN KEISTIMEWAAN","bulan":{"01":11,"02":13,"03":14,"04":13,"05":12,"06":17,"07":14},"rata2":13,"klasifikasi":"Lambat"},"008601":{"nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","bulan":{"01":11,"02":31,"03":13,"04":12,"05":9,"06":22,"07":10},"rata2":15,"klasifikasi":"Lambat"},"008657":{"nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","bulan":{"01":11,"02":30,"03":13,"04":12,"05":9,"06":22,"07":11},"rata2":15,"klasifikasi":"Lambat"},"099748":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"01":18,"02":18,"03":13,"04":12,"05":11,"06":20,"07":13},"rata2":15,"klasifikasi":"Lambat"},"099749":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"01":11,"02":18,"03":13,"04":12,"05":11,"06":20,"07":13},"rata2":14,"klasifikasi":"Lambat"}};
+const CAPAIAN_DATA = {"280332":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA UTARA","bulan":{"04":4,"05":2,"06":4,"07":3},"rata2":3,"klasifikasi":"Cepat"},"280816":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"04":1,"05":1,"06":1,"07":4},"rata2":2,"klasifikasi":"Cepat"},"280818":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"04":1,"05":1,"06":1,"07":1},"rata2":1,"klasifikasi":"Cepat"},"280819":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"04":2,"05":1,"06":1,"07":1},"rata2":1,"klasifikasi":"Cepat"},"280820":{"nama":"KANTOR KEMENTERIAN AGAMA KABUPATEN PULAU MOROTAI","bulan":{"04":2,"05":1,"06":1,"07":1},"rata2":1,"klasifikasi":"Cepat"},"280823":{"nama":"Badan Pusat Statistik Kab. Pulau Morotai","bulan":{"04":7,"05":3,"06":3,"07":6},"rata2":5,"klasifikasi":"Normal"},"280830":{"nama":"POLRES PULAU MOROTAI","bulan":{"04":8,"05":4,"06":4,"07":7},"rata2":6,"klasifikasi":"Normal"},"307796":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"04":1,"05":1,"06":2,"07":3},"rata2":2,"klasifikasi":"Cepat"},"309102":{"nama":"PENGADILAN AGAMA MOROTAI","bulan":{"04":4,"05":3,"06":6,"07":4},"rata2":4,"klasifikasi":"Cepat"},"344702":{"nama":"LANAL MOROTAI","bulan":{"04":8,"05":4,"06":7,"07":7},"rata2":7,"klasifikasi":"Normal"},"344856":{"nama":"LANUD LEO WATTIMENA","bulan":{"04":5,"05":3,"06":7,"07":6},"rata2":5,"klasifikasi":"Normal"},"410000":{"nama":"KANTOR PELAYANAN PAJAK PRATAMA TOBELO","bulan":{"04":6,"05":4,"06":6,"07":7},"rata2":6,"klasifikasi":"Normal"},"413642":{"nama":"UNIT PENYELENGGARA PELABUHAN T O B E L O","bulan":{"04":5,"05":9,"06":1,"07":4},"rata2":5,"klasifikasi":"Normal"},"414220":{"nama":"KANTOR UPBU GAMAR MALAMO","bulan":{"04":4,"05":4,"06":3,"07":4},"rata2":4,"klasifikasi":"Cepat"},"419280":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN PULAU MOROTAI","bulan":{"04":6,"05":5,"06":8,"07":10},"rata2":7,"klasifikasi":"Normal"},"429019":{"nama":"KANTOR PERTANAHAN KABUPATEN HALMAHERA TIMUR","bulan":{"04":4,"05":4,"06":2,"07":5},"rata2":4,"klasifikasi":"Cepat"},"437746":{"nama":"STASIUN METEOROLOGI GAMAR MALAMO","bulan":{"04":11,"05":5,"06":6,"07":5},"rata2":7,"klasifikasi":"Normal"},"447899":{"nama":"KANTOR UPBU BULI","bulan":{"04":3,"05":3,"06":2,"07":3},"rata2":3,"klasifikasi":"Cepat"},"449493":{"nama":"KANTOR UPBU PITU","bulan":{"04":1,"05":2,"06":5,"07":8},"rata2":4,"klasifikasi":"Cepat"},"452878":{"nama":"KANTOR PELAYANAN PERBENDAHARAAN NEGARA TOBELO","bulan":{"04":5,"05":6,"06":3,"07":6},"rata2":5,"klasifikasi":"Normal"},"500239":{"nama":"KPPN TOBELO PENYALUR DANA TRANSFER UMUM","bulan":{"04":7,"05":9,"06":3,"07":5},"rata2":6,"klasifikasi":"Normal"},"521992":{"nama":"KANTOR UPBU KUABANG","bulan":{"04":4,"05":4,"06":4,"07":5},"rata2":4,"klasifikasi":"Cepat"},"559438":{"nama":"UNIT PENYELENGGARA PELABUHAN DARUBA","bulan":{"04":5,"05":4,"06":8,"07":7},"rata2":6,"klasifikasi":"Normal"},"559470":{"nama":"UNIT PENYELENGGARA PELABUHAN BULI","bulan":{"04":5,"05":9,"06":9,"07":4},"rata2":7,"klasifikasi":"Normal"},"600175":{"nama":"KPPN TOBELO PENYALUR DANA TRANSFER KHUSUS","bulan":{"04":7,"05":3,"06":3,"07":5},"rata2":5,"klasifikasi":"Normal"},"601330":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"04":2,"05":3,"06":4,"07":2},"rata2":3,"klasifikasi":"Cepat"},"601344":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 MOROTAI","bulan":{"04":2,"05":1,"06":1,"07":1},"rata2":1,"klasifikasi":"Cepat"},"601408":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"04":2,"05":3,"06":4,"07":2},"rata2":3,"klasifikasi":"Cepat"},"605135":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"04":1,"05":2,"06":2,"07":3},"rata2":2,"klasifikasi":"Cepat"},"650007":{"nama":"KEJAKSAAN NEGERI HALMAHERA TIMUR","bulan":{"04":5,"05":4,"06":6,"07":3},"rata2":5,"klasifikasi":"Normal"},"655310":{"nama":"POLRES HALMAHERA UTARA","bulan":{"04":5,"05":6,"06":6,"07":6},"rata2":6,"klasifikasi":"Normal"},"659672":{"nama":"KPU KABUPATEN HALMAHERA UTARA","bulan":{"04":8,"05":5,"06":4,"07":4},"rata2":5,"klasifikasi":"Normal"},"659690":{"nama":"KPU KABUPATEN HALMAHERA TIMUR","bulan":{"04":8,"05":5,"06":2,"07":4},"rata2":5,"klasifikasi":"Normal"},"661892":{"nama":"MADRASAH TSANAWIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"04":6,"05":2,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat"},"664110":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"04":2,"05":3,"06":5,"07":2},"rata2":3,"klasifikasi":"Cepat"},"664111":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"04":5,"05":4,"06":6,"07":7},"rata2":6,"klasifikasi":"Normal"},"664112":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"04":6,"05":4,"06":5,"07":3},"rata2":5,"klasifikasi":"Normal"},"664113":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA UTARA","bulan":{"04":4,"05":4,"06":3,"07":6},"rata2":4,"klasifikasi":"Cepat"},"664124":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"04":7,"05":2,"06":5,"07":4},"rata2":5,"klasifikasi":"Normal"},"664125":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"04":4,"05":2,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat"},"664126":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"04":7,"05":3,"06":6,"07":3},"rata2":5,"klasifikasi":"Normal"},"664128":{"nama":"KANTOR KEMENTERIAN AGAMA KAB. HALMAHERA TIMUR","bulan":{"04":4,"05":2,"06":5,"07":3},"rata2":4,"klasifikasi":"Cepat"},"665751":{"nama":"POLRES HALMAHERA TIMUR","bulan":{"04":2,"05":4,"06":1,"07":2},"rata2":2,"klasifikasi":"Cepat"},"667524":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA UTARA","bulan":{"04":8,"05":9,"06":7,"07":5},"rata2":7,"klasifikasi":"Normal"},"668732":{"nama":"BADAN PUSAT STATISTIK KAB. HALMAHERA TIMUR","bulan":{"04":4,"05":17,"06":5,"07":7},"rata2":8,"klasifikasi":"Lambat"},"674746":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 MOROTAI KAB. PULAU MOROTAI","bulan":{"04":2,"05":1,"06":2,"07":1},"rata2":2,"klasifikasi":"Cepat"},"674750":{"nama":"MADRASAH TSANAWIYAH NEGERI 2 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"04":8,"05":5,"06":6,"07":5},"rata2":6,"klasifikasi":"Normal"},"675340":{"nama":"MADRASAH ALIYAH NEGERI 1 HALMAHERA TIMUR KAB. HALMAHERA TIMUR","bulan":{"04":7,"05":3,"06":6,"07":3},"rata2":5,"klasifikasi":"Normal"},"675357":{"nama":"MADRASAH ALIYAH NEGERI 2 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"04":4,"05":2,"06":1,"07":5},"rata2":3,"klasifikasi":"Cepat"},"680022":{"nama":"MADRASAH TSANAWIYAH NEGERI 3 HALMAHERA UTARA KAB. HALMAHERA UTARA","bulan":{"04":1,"05":3,"06":1,"07":3},"rata2":2,"klasifikasi":"Cepat"},"680739":{"nama":"KPU KABUPATEN KEPULAUAN MOROTAI","bulan":{"04":8,"05":5,"06":4,"07":4},"rata2":5,"klasifikasi":"Normal"},"689403":{"nama":"KANTOR PERTANAHAN KAB. PULAU MOROTAI","bulan":{"04":6,"05":2,"06":4,"07":3},"rata2":4,"klasifikasi":"Cepat"},"689884":{"nama":"BADAN NARKOTIKA NASIONAL KABUPATEN HALMAHERA UTARA","bulan":{"04":7,"05":4,"06":6,"07":5},"rata2":6,"klasifikasi":"Normal"},"690462":{"nama":"LOKA POM DI KABUPATEN PULAU MOROTAI","bulan":{"04":6,"05":8,"06":6,"07":7},"rata2":7,"klasifikasi":"Normal"},"691683":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KABUPATEN PULAU MOROTAI","bulan":{"04":5,"05":8,"06":8,"07":6},"rata2":7,"klasifikasi":"Normal"},"691684":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KABUPATEN HALMAHERA UTARA","bulan":{"04":4,"05":5,"06":1,"07":7},"rata2":4,"klasifikasi":"Cepat"},"692111":{"nama":"LAPAS KELAS II B TOBELLO","bulan":{"04":2,"05":1,"06":1,"07":2},"rata2":2,"klasifikasi":"Cepat"},"692956":{"nama":"KANTOR IMIGRASI KELAS II NON TPI TOBELO","bulan":{"04":8,"05":4,"06":3,"07":7},"rata2":6,"klasifikasi":"Normal"},"693938":{"nama":"PELAKSANAAN JALAN NASIONAL WILAYAH I PROVINSI MALUKU UTARA","bulan":{"04":6,"05":5,"06":6,"07":5},"rata2":6,"klasifikasi":"Normal"},"694632":{"nama":"DINAS TENAGA KERJA DAN TRANSMIGRASI KAB. HALMAHERA TIMUR","bulan":{"04":5,"05":8,"06":7,"07":7},"rata2":7,"klasifikasi":"Normal"},"694953":{"nama":"BRIGIF TP 28/BARI FOLA","bulan":{"04":6,"05":3,"06":6,"07":6},"rata2":5,"klasifikasi":"Normal"},"695302":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA UTARA","bulan":{"04":12,"05":1,"06":5,"07":3},"rata2":5,"klasifikasi":"Normal"},"695305":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. HALMAHERA TIMUR","bulan":{"04":4,"05":3,"06":1,"07":3},"rata2":3,"klasifikasi":"Cepat"},"695307":{"nama":"KANTOR KEMENTERIAN HAJI DAN UMRAH KAB. PULAU MOROTAI","bulan":{"04":2,"05":1,"06":1,"07":1},"rata2":1,"klasifikasi":"Cepat"},"700358":{"nama":"KPPN TOBELO PENYALUR DANA DESA, INSENTIF FISKAL, OTONOMI KHUSUS DAN KEISTIMEWAAN","bulan":{"04":7,"05":3,"06":3,"07":5},"rata2":5,"klasifikasi":"Normal"},"008601":{"nama":"KEJAKSAAN NEGERI HALMAHERA UTARA","bulan":{"04":11,"05":3,"06":4,"07":6},"rata2":6,"klasifikasi":"Normal"},"008657":{"nama":"KEJAKSAAN NEGERI KEPULAUAN MOROTAI","bulan":{"04":7,"05":4,"06":6,"07":4},"rata2":5,"klasifikasi":"Normal"},"099748":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"04":8,"05":4,"06":7,"07":5},"rata2":6,"klasifikasi":"Normal"},"099749":{"nama":"PENGADILAN NEGERI TOBELO","bulan":{"04":7,"05":5,"06":7,"07":5},"rata2":6,"klasifikasi":"Normal"}};
+
+const MONTHLY_INDICATORS = {
+  gaji:    { label: 'Gaji Induk (PNS/Polri/TNI)', icon: '💰', thresholds: [6,12] },
+  pppk:    { label: 'Gaji Induk PPPK',             icon: '💵', thresholds: [6,12] },
+  rekon:   { label: 'Rekonsiliasi SHR',            icon: '🔄', thresholds: [6,12] },
+  capaian: { label: 'Capaian Output',              icon: '🎯', thresholds: [4,7]  }
+};
+const MONTHLY_MONTH_LABELS = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Agu',9:'Sep',10:'Okt',11:'Nov',12:'Des'};
+
+function monthKls(val, th){
+  if(val===null||val===undefined||val==='') return 'belum';
+  var v=parseInt(val);
+  if(isNaN(v)) return 'belum';
+  return v<=th[0]?'Cepat':v<=th[1]?'Normal':'Lambat';
+}
+function monthColor(c){return{Cepat:'#065F46',Normal:'#1E40AF',Lambat:'#D97706',belum:'var(--red)'}[c]||'var(--gray-400)';}
+function monthBadgeTxt(c){return{Cepat:'🚀 Cepat',Normal:'👍 Normal',Lambat:'🔥 Lambat',belum:'❌ Belum Ada Data'}[c]||'—';}
+
+function renderMonthlyBox(kode, dataConst, cfg){
+  var d = dataConst ? dataConst[kode] : null;
+  if(!d){
+    return '<div class="modal-lpj-box"><div class="modal-lpj-box-title">'+cfg.icon+' '+cfg.label+'</div><div class="modal-lpj-na">Data belum tersedia untuk satker ini.</div></div>';
+  }
+  var hist = d.bulan || {};
+  var kls = d.klasifikasi || 'belum';
+  var maxBar = cfg.thresholds[1] + 5;
+  var histRows = Object.keys(MONTHLY_MONTH_LABELS).map(function(mo){
+    var mk = String(mo).padStart(2,'0');
+    var tgl = hist[mk];
+    var label = MONTHLY_MONTH_LABELS[mo];
+    if(!tgl){
+      return '<div class="modal-lpj-row"><div class="modal-lpj-month">'+label+'</div><div class="modal-lpj-bar-wrap"><div class="modal-lpj-bar" style="width:0%;background:#E2E8F0"></div></div><div class="modal-lpj-tgl" style="color:#CBD5E1;font-size:.62rem">—</div></div>';
+    }
+    var c2 = monthKls(tgl, cfg.thresholds);
+    var barW = Math.min(100, Math.round(parseInt(tgl)/maxBar*100));
+    return '<div class="modal-lpj-row"><div class="modal-lpj-month">'+label+'</div><div class="modal-lpj-bar-wrap"><div class="modal-lpj-bar" style="width:'+barW+'%;background:'+monthColor(c2)+'"></div></div><div class="modal-lpj-tgl" style="color:'+monthColor(c2)+'">tgl '+tgl+'</div></div>';
+  }).join('');
+  return '<div class="modal-lpj-box"><div class="modal-lpj-box-title">'+cfg.icon+' '+cfg.label+'</div>'+
+    '<span class="modal-lpj-badge '+kls+'">'+monthBadgeTxt(kls)+'</span>'+
+    '<div class="modal-lpj-rata">'+(d.rata2!=null?'tgl '+d.rata2:'—')+'</div>'+
+    '<div class="modal-lpj-rata-lbl">rata-rata hari</div>'+
+    '<div class="modal-lpj-hist" style="margin-top:10px">'+histRows+'</div>'+
+  '</div>';
+}
+
+function monthlyKlasBadge(k){
+  var m={Cepat:'<span class="pill pill-green">🚀 Cepat</span>',Normal:'<span class="pill pill-blue">👍 Normal</span>',Lambat:'<span class="pill pill-amber">🔥 Lambat</span>'};
+  return m[k] || '<span class="pill pill-gray">— Tidak Ada Data</span>';
+}
+
+var MONTHLY_STATE = {};
+['gaji','pppk','rekon','capaian'].forEach(function(k){ MONTHLY_STATE[k]={filt:'all',q:'',sortK:'rata2',sortD:1,page:1}; });
+const MONTHLY_PP = 20;
+function monthlyDataFor(key){
+  return {gaji:GAJI_DATA,pppk:PPPK_DATA,rekon:REKON_DATA,capaian:CAPAIAN_DATA}[key] || {};
+}
+function getMonthlyRows(key){
+  var DATA = monthlyDataFor(key);
+  var st = MONTHLY_STATE[key];
+  var rows = Object.keys(DATA).map(function(kode){
+    var d = DATA[kode];
+    return {kode:kode, nama:d.nama, rata2:d.rata2, klasifikasi:d.klasifikasi||'belum', bulan:d.bulan||{}};
+  });
+  if(st.filt==='cepat') rows=rows.filter(function(r){return r.klasifikasi==='Cepat';});
+  else if(st.filt==='normal') rows=rows.filter(function(r){return r.klasifikasi==='Normal';});
+  else if(st.filt==='lambat') rows=rows.filter(function(r){return r.klasifikasi==='Lambat';});
+  if(st.q){
+    var q=st.q.toLowerCase();
+    rows=rows.filter(function(r){return r.nama.toLowerCase().includes(q)||r.kode.includes(q);});
+  }
+  rows.sort(function(a,b){
+    var v = st.sortK==='nama'?a.nama.localeCompare(b.nama): st.sortK==='kode'?a.kode.localeCompare(b.kode): ((a[st.sortK]||0)-(b[st.sortK]||0));
+    return st.sortD*v;
+  });
+  return rows;
+}
+function monthCellHtml(tgl, thresholds){
+  if(tgl===null||tgl===undefined||tgl===''){
+    return '<span style="color:var(--red);font-size:.72rem;font-weight:600">—</span>';
+  }
+  var cls = monthKls(tgl, thresholds);
+  var bg = {Cepat:'#ECFDF5',Normal:'#EFF6FF',Lambat:'#FFF7ED'}[cls] || '#F1F5F9';
+  var fg = {Cepat:'#065F46',Normal:'#1E40AF',Lambat:'#D97706'}[cls] || '#94A3B8';
+  return '<span style="display:inline-block;padding:2px 7px;border-radius:12px;font-size:.72rem;font-weight:700;background:'+bg+';color:'+fg+'">tgl '+tgl+'</span>';
+}
+function renderMonthlyTable(key){
+  var cfg = MONTHLY_INDICATORS[key];
+  var st = MONTHLY_STATE[key];
+  var rows = getMonthlyRows(key);
+  var s=(st.page-1)*MONTHLY_PP, pageRows=rows.slice(s,s+MONTHLY_PP);
+  var tbody = document.getElementById(key+'-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = pageRows.map(function(r){
+    var monthCells = Object.keys(MONTHLY_MONTH_LABELS).map(function(mo){
+      var mk = String(mo).padStart(2,'0');
+      return '<td class="num">'+monthCellHtml(r.bulan[mk], cfg.thresholds)+'</td>';
+    }).join('');
+    return '<tr class="clickable" onclick="openModal('+JSON.stringify(r.kode)+')"><td>'+sCell(r.kode,r.nama)+'</td>'+monthCells+'<td class="num" style="font-weight:700">'+(r.rata2!=null?'tgl '+r.rata2:'—')+'</td><td>'+monthlyKlasBadge(r.klasifikasi)+'</td></tr>';
+  }).join('') || '<tr><td colspan="15" class="no-data">Tidak ada data</td></tr>';
+  var countEl = document.getElementById(key+'-count');
+  if(countEl) countEl.textContent = 'Menampilkan '+pageRows.length+' dari '+rows.length+' satker';
+  pages(key+'-pages', Math.ceil(rows.length/MONTHLY_PP), st.page, new Function('p', "MONTHLY_STATE['"+key+"'].page=p; renderMonthlyTable('"+key+"');"));
+}
+function filterMonthly(key,f,btn){
+  MONTHLY_STATE[key].filt=f; MONTHLY_STATE[key].page=1;
+  var sel='#page-'+key+' .filter-btn';
+  document.querySelectorAll(sel).forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  renderMonthlyTable(key);
+}
+function searchMonthly(key,v){ MONTHLY_STATE[key].q=v; MONTHLY_STATE[key].page=1; renderMonthlyTable(key); }
+function sortMonthly(key,k){
+  var st=MONTHLY_STATE[key];
+  st.sortD = st.sortK===k?-st.sortD:(k==='nama'?1:-1);
+  st.sortK=k; st.page=1; renderMonthlyTable(key);
+}
+
+
+// ---- UTILS ----
+const fmt=n=>n.toLocaleString('id-ID');
+const fmtRp=n=>{if(n>=1e6)return'Rp '+(n/1e6).toFixed(1)+' jt';return'Rp '+fmt(n);}
+function cmsStatus(pct,total){
+  if(total===0)return'<span class="pill pill-gray">⚪ Nol Trx</span>';
+  if(pct>=70)return'<span class="pill pill-green">✅ ≥ 70%</span>';
+  return'<span class="pill pill-red">❌ &lt; 70%</span>';
+}
+function kkpStatus(trx){
+  if(trx>=10)return'<span class="pill pill-green">✅ ≥ 10 Trx</span>';
+  if(trx===0)return'<span class="pill pill-red">❌ Belum Trx</span>';
+  return`<span class="pill pill-amber">⚠️ ${trx} Trx</span>`;
+}
+function pBar(pct,total){
+  if(total===0)return'<span style="color:#94A3B8;font-size:.72rem">Belum bertransaksi</span>';
+  const c=pct>=70?'green':pct>=40?'amber':'red';
+  return`<div class="pbar-wrap"><div class="pbar"><div class="pbar-fill ${c}" style="width:${Math.min(100,pct)}%"></div></div><div class="pbar-label ${c}">${pct.toFixed(1)}%</div></div>`;
+}
+function kkpBar(trx){
+  const c=trx>=10?'green':trx===0?'red':'amber';
+  return`<div class="pbar-wrap"><div class="pbar"><div class="pbar-fill ${c}" style="width:${Math.min(100,(trx/10)*100)}%"></div></div><div class="pbar-label ${c}">${trx}/10</div></div>`;
+}
+function sCell(kode,nama){return`<div class="satker-name">${nama}<div class="satker-code">${kode}</div></div>`;}
+function pages(cid,total,cur,cb){
+  if(total<=1){document.getElementById(cid).innerHTML='';return;}
+  let h=`<button class="page-btn" ${cur===1?'disabled':''} onclick="(${cb.toString()})(${cur-1})">‹</button>`;
+  for(let i=1;i<=total;i++){
+    if(i===1||i===total||Math.abs(i-cur)<=1)h+=`<button class="page-btn ${i===cur?'cur':''}" onclick="(${cb.toString()})(${i})">${i}</button>`;
+    else if(Math.abs(i-cur)===2)h+=`<span style="padding:3px 1px;color:#94A3B8">…</span>`;
+  }
+  h+=`<button class="page-btn" ${cur===total?'disabled':''} onclick="(${cb.toString()})(${cur+1})">›</button>`;
+  document.getElementById(cid).innerHTML=h;
+}
+
+// ---- TABS ----
+function switchTab(t){
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.toggle('active', el.dataset.tab===t);});
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  if(t==='cms'&&typeof renderCmsPriority==='function') renderCmsPriority();
+  if(t==='kkp'&&typeof renderKkpPriority==='function') renderKkpPriority();
+  if(t==='lpj'&&typeof renderLpjPriority==='function') renderLpjPriority();
+  if(t==='gaji'&&typeof renderMonthlyTable==='function') renderMonthlyTable('gaji');
+  if(t==='pppk'&&typeof renderMonthlyTable==='function') renderMonthlyTable('pppk');
+  if(t==='rekon'&&typeof renderMonthlyTable==='function') renderMonthlyTable('rekon');
+  if(t==='capaian'&&typeof renderMonthlyTable==='function') renderMonthlyTable('capaian');
+}
+
+// ---- CMS TABLE ----
+let cmsFilt='all',cmsQ='',cmsSortK='pct',cmsSortD=1,cmsP=1;
+const CMSPP=20;
+function getCMSData(){
+  let d=[...CMS_DATA];
+  if(cmsFilt==='ok')d=d.filter(r=>r.pct>=70&&r.total>0);
+  else if(cmsFilt==='below')d=d.filter(r=>r.pct<70&&r.total>0);
+  else if(cmsFilt==='zero')d=d.filter(r=>r.total===0);
+  if(cmsQ)d=d.filter(r=>r.nama.toLowerCase().includes(cmsQ.toLowerCase())||r.kode.includes(cmsQ));
+  d.sort((a,b)=>{
+    let v=cmsSortK==='nama'?a.nama.localeCompare(b.nama):(a[cmsSortK]-b[cmsSortK]);
+    return cmsSortD*v;
+  });
+  return d;
+}
+function renderCMS(){
+  const d=getCMSData(),s=(cmsP-1)*CMSPP,rows=d.slice(s,s+CMSPP);
+  document.getElementById('cms-tbody').innerHTML=rows.map(r=>
+    `<tr class="clickable" onclick="openModal('${r.kode}')"><td>${sCell(r.kode,r.nama)}</td><td class="num">${fmt(r.cms)}</td><td class="num">${fmt(r.debit)}</td><td class="num">${fmt(r.teller)}</td><td class="num">${fmt(r.total)}</td><td>${pBar(r.pct,r.total)}</td><td>${cmsStatus(r.pct,r.total)}</td></tr>`
+  ).join('')||'<tr><td colspan="7" class="no-data">Tidak ada data</td></tr>';
+  document.getElementById('cms-count').textContent=`Menampilkan ${rows.length} dari ${d.length} satker`;
+  pages('cms-pages',Math.ceil(d.length/CMSPP),cmsP,p=>{cmsP=p;renderCMS();});
+  ['nama','cms','debit','teller','total','pct'].forEach(k=>{
+    const el=document.getElementById('th-'+k);
+    if(el){el.classList.toggle('sorted',cmsSortK===k);el.querySelector('.sort-arrow').textContent=cmsSortK===k?(cmsSortD===1?'↑':'↓'):'↕';}
+  });
+}
+function filterCMS(f,btn){cmsFilt=f;cmsP=1;document.querySelectorAll('#page-cms .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCMS();}
+function searchCMS(v){cmsQ=v;cmsP=1;renderCMS();}
+function sortCMS(k){cmsSortD=cmsSortK===k?-cmsSortD:(k==='nama'?1:-1);cmsSortK=k;renderCMS();}
+
+// ---- KKP TABLE ----
+let kkpFilt='all',kkpQ='',kkpP=1,kkpSortK='trx',kkpSortD=1;
+const KKPPP=20;
+function getKKPData(){
+  let d=[...KKP_DATA];
+  if(kkpFilt==='ok')d=d.filter(r=>r.trx>=10);
+  else if(kkpFilt==='below')d=d.filter(r=>r.trx<10);
+  if(kkpQ)d=d.filter(r=>r.nama.toLowerCase().includes(kkpQ.toLowerCase())||r.kode.includes(kkpQ));
+  d.sort((a,b)=>{
+    let v=kkpSortK==='nama'?a.nama.localeCompare(b.nama):kkpSortK==='kode'?a.kode.localeCompare(b.kode):(a[kkpSortK]-b[kkpSortK]);
+    return kkpSortD*v;
+  });
+  return d;
+}
+function renderKKP(){
+  const d=getKKPData(),s=(kkpP-1)*KKPPP,rows=d.slice(s,s+KKPPP);
+  document.getElementById('kkp-tbody').innerHTML=rows.map(r=>
+    `<tr class="clickable" onclick="openModal('${r.kode}')"><td>${sCell(r.kode,r.nama)}</td><td class="num">${r.dom>0?fmtRp(r.dom):'<span style="color:#94A3B8">—</span>'}</td><td class="num">${r.nondom>0?fmtRp(r.nondom):'<span style="color:#94A3B8">—</span>'}</td><td class="num" style="font-weight:700;font-size:1rem">${r.trx}</td><td>${kkpBar(r.trx)}</td><td>${kkpStatus(r.trx)}</td></tr>`
+  ).join('')||'<tr><td colspan="6" class="no-data">Tidak ada data</td></tr>';
+  document.getElementById('kkp-count').textContent=`Menampilkan ${rows.length} dari ${d.length} satker`;
+  pages('kkp-pages',Math.ceil(d.length/KKPPP),kkpP,p=>{kkpP=p;renderKKP();});
+  ['nama','dom','nondom','trx'].forEach(k=>{
+    const el=document.getElementById('th-kkp-'+k);
+    if(el){el.classList.toggle('sorted',kkpSortK===k);el.querySelector('.sort-arrow').textContent=kkpSortK===k?(kkpSortD===1?'↑':'↓'):'⇕';}
+  });
+}
+function sortKKP(k){kkpSortD=kkpSortK===k?-kkpSortD:(k==='nama'?1:-1);kkpSortK=k;kkpP=1;renderKKP();}
+function filterKKP(f,btn){kkpFilt=f;kkpP=1;document.querySelectorAll('#page-kkp .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderKKP();}
+function searchKKP(v){kkpQ=v;kkpP=1;renderKKP();}
+
+// ---- PRIORITY TABLE ----
+let prioSortK='pct',prioSortD=1;
+function getPriorityData(){
+  const kkpMap=Object.fromEntries(KKP_DATA.map(k=>[k.kode,k]));
+  let rows=CMS_DATA.filter(r=>r.pct<70&&r.total>0&&kkpMap[r.kode]&&kkpMap[r.kode].trx<10).map(r=>({...r,trx:kkpMap[r.kode].trx}));
+  rows.sort((a,b)=>{
+    let v=prioSortK==='nama'?a.nama.localeCompare(b.nama):prioSortK==='kode'?a.kode.localeCompare(b.kode):(a[prioSortK]-b[prioSortK]);
+    return prioSortD*v;
+  });
+  return rows;
+}
+function renderPriority(){
+  const rows=getPriorityData();
+  document.getElementById('priority-tbody').innerHTML=rows.map(r=>{
+    return`<tr class="clickable" onclick="openModal('${r.kode}')"><td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">${r.kode}</code></td><td class="satker-name">${r.nama}</td><td>${pBar(r.pct,r.total)}</td><td class="num" style="font-weight:700">${r.trx}</td><td>${cmsStatus(r.pct,r.total)}</td><td>${kkpStatus(r.trx)}</td></tr>`;
+  }).join('')||'<tr><td colspan="6" class="no-data">🎉 Semua satker memenuhi kedua target!</td></tr>';
+  ['kode','nama','pct','trx'].forEach(k=>{
+    const el=document.getElementById('th-p-'+k);
+    if(el){el.classList.toggle('sorted',prioSortK===k);el.querySelector('.sort-arrow').textContent=prioSortK===k?(prioSortD===1?'↑':'↓'):'⇕';}
+  });
+}
+function sortPriority(k){prioSortD=prioSortK===k?-prioSortD:(k==='nama'||k==='kode'?1:-1);prioSortK=k;renderPriority();}
+
+// ---- MODAL ----
+const KKP_MAP = Object.fromEntries(KKP_DATA.map(k=>[k.kode,k]));
+const CMS_MAP = Object.fromEntries(CMS_DATA.map(c=>[c.kode,c]));
+const CIRC = 263.9; // 2 * pi * 42
+
+function openModal(kode){
+  const cms = CMS_MAP[kode];
+  const kkp = KKP_MAP[kode];
+  if(!cms) return;
+
+  // Header
+  document.getElementById('m-kode').textContent = kode;
+  document.getElementById('m-nama').textContent = cms.nama;
+
+  // CMS stats
+  document.getElementById('m-cms').textContent = fmt(cms.cms);
+  document.getElementById('m-debit').textContent = fmt(cms.debit);
+  document.getElementById('m-teller').textContent = fmt(cms.teller);
+
+  // Donut chart
+  const total = cms.total;
+  const cmsPct   = total > 0 ? cms.cms   / total : 0;
+  const debitPct = total > 0 ? cms.debit / total : 0;
+  const tellPct  = total > 0 ? cms.teller/ total : 0;
+  const cmsLen   = cmsPct   * CIRC;
+  const debitLen = debitPct * CIRC;
+  const tellLen  = tellPct  * CIRC;
+  const BASE_OFFSET = 66;
+  const arc1 = document.getElementById('m-donut-arc');
+  const arc2 = document.getElementById('m-donut-arc2');
+  const arc3 = document.getElementById('m-donut-arc3');
+  arc1.setAttribute('stroke-dasharray', `${cmsLen} ${CIRC - cmsLen}`);
+  arc1.setAttribute('stroke-dashoffset', BASE_OFFSET);
+  const off2 = BASE_OFFSET - cmsLen;
+  arc2.setAttribute('stroke-dasharray', `${debitLen} ${CIRC - debitLen}`);
+  arc2.setAttribute('stroke-dashoffset', off2);
+  const off3 = off2 - debitLen;
+  arc3.setAttribute('stroke-dasharray', `${tellLen} ${CIRC - tellLen}`);
+  arc3.setAttribute('stroke-dashoffset', off3);
+
+  const pctEl = document.getElementById('m-pct-val');
+  const pctNum = total > 0 ? (cms.cms / total * 100) : 0;
+  const pctCls = pctNum >= 70 ? 'green' : pctNum >= 40 ? 'amber' : (total === 0 ? '' : 'red');
+  pctEl.className = `donut-pct ${pctCls}`;
+  pctEl.textContent = total === 0 ? '—' : pctNum.toFixed(1) + '%';
+  document.getElementById('m-pct-caption').textContent = total === 0
+    ? 'Belum ada transaksi'
+    : `dari ${fmt(total)} total transaksi`;
+
+  let saranCms = '';
+  if(total === 0){
+    saranCms = `<div class="saran-box warn"><div class="saran-title">Catatan</div>Belum ada transaksi tercatat di semua channel (CMS, Teller, Kartu Debit) pada periode ini.</div>`;
+  } else if(pctNum >= 70){
+    saranCms = `<div class="saran-box good"><div class="saran-title">Status CMS</div>Capaian CMS sudah memenuhi target ≥70%. Pertahankan penggunaan CMS sebagai channel utama pembayaran.</div>`;
+  } else if(pctNum >= 40){
+    saranCms = `<div class="saran-box warn"><div class="saran-title">Status CMS</div>Capaian CMS masih di bawah target 70%. Perlu peningkatan — alihkan transaksi teller/debit ke CMS sebisa mungkin.</div>`;
+  } else {
+    saranCms = `<div class="saran-box bad"><div class="saran-title">Status CMS</div>Capaian CMS sangat rendah (${pctNum.toFixed(1)}%). Sebagian besar transaksi masih dilakukan via teller/debit. Perlu perhatian segera.</div>`;
+  }
+  document.getElementById('m-saran-cms').innerHTML = saranCms;
+
+  // KKP section
+  const kkpSec = document.getElementById('m-kkp-content');
+  if(!kkp){
+    kkpSec.innerHTML = `<div class="no-kkp-box">Satker ini tidak memiliki proporsi UP KKP, sehingga <strong>tidak wajib</strong> melakukan transaksi KKP.</div>`;
+  } else {
+    const trx = kkp.trx;
+    const kkpProg = Math.min(100, (trx / 10) * 100);
+    let saranKkp = '';
+    if(trx >= 10){
+      saranKkp = `<div class="saran-box good"><div class="saran-title">Status KKP</div>Sudah memenuhi target minimal 10 transaksi KKP. Pertahankan penggunaan KKP.</div>`;
+    } else if(trx === 0){
+      saranKkp = `<div class="saran-box bad"><div class="saran-title">Status KKP</div>Belum ada transaksi KKP sama sekali. Satker ini wajib menggunakan KKP sesuai proporsi UP yang telah ditetapkan.</div>`;
+    } else {
+      saranKkp = `<div class="saran-box warn"><div class="saran-title">Status KKP</div>Baru ${trx} dari 10 transaksi yang ditargetkan. Masih perlu ${10 - trx} transaksi lagi untuk memenuhi target.</div>`;
+    }
+    kkpSec.innerHTML = `
+      <div class="kkp-detail-row" style="margin-bottom:12px">
+        <div class="kkp-stat">
+          <div class="kkp-stat-val">${kkp.dom > 0 ? fmtRp(kkp.dom) : '—'}</div>
+          <div class="kkp-stat-lbl">UP KKP Domestik</div>
+        </div>
+        <div class="kkp-stat">
+          <div class="kkp-stat-val">${kkp.nondom > 0 ? fmtRp(kkp.nondom) : '—'}</div>
+          <div class="kkp-stat-lbl">UP KKP Non-Domestik</div>
+        </div>
+        <div class="kkp-stat" style="border-color:${trx>=10?'#BBF7D0':trx===0?'#FECACA':'#FDE68A'}">
+          <div class="kkp-stat-val" style="color:${trx>=10?'var(--green)':trx===0?'var(--red)':'var(--amber)'}">` + `${trx}</div>
+          <div class="kkp-stat-lbl">Transaksi KKP</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray-600);margin-bottom:5px">
+          <span>Progress ke target 10 transaksi</span>
+          <span style="font-weight:700">${trx}/10</span>
+        </div>
+        <div style="height:10px;background:var(--gray-200);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${kkpProg}%;background:${trx>=10?'var(--green)':trx===0?'var(--red)':'var(--amber)'};border-radius:6px;transition:width .4s ease"></div>
+        </div>
+      </div>
+      ${saranKkp}`;
+  }
+
+  // ── LPJ section ──────────────────────────────────────────────────────────
+  const lpjEl = document.getElementById('m-lpj-content');
+  const lpjSatker = (typeof LPJ_DATA !== 'undefined') ? LPJ_DATA[kode] : null;
+  const BULAN_LPJ_M = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Agu',9:'Sep',10:'Okt',11:'Nov',12:'Des'};
+  const ALL_M = [1,2,3,4,5,6,7,8,9,10,11,12];
+  const nowM = new Date().getMonth() + 1;
+
+  function lpjKlsM(d){
+    if(!d) return 'belum';
+    if(d.klasifikasi) return d.klasifikasi;
+    if(!d.rata2) return 'belum';
+    var t2=parseInt(d.rata2); return t2<=4?'Cepat':t2<=7?'Normal':'Lambat';
+  }
+  function lpjColorM(c){return{Cepat:'#065F46',Normal:'#1E40AF',Lambat:'#D97706',belum:'var(--red)'}[c]||'var(--gray-400)';}
+  function lpjBgM(c){return{Cepat:'#ECFDF5',Normal:'#EFF6FF',Lambat:'#FFF7ED',belum:'var(--red-bg)'}[c]||'var(--gray-100)';}
+  function lpjBadgeTxtM(c){return{Cepat:'🚀 Cepat',Normal:'👍 Normal',Lambat:'🔥 Lambat',belum:'❌ Belum Kirim'}[c]||'—';}
+  function lpjTglClsM(tgl){if(!tgl)return 'belum';var t2=parseInt(tgl);return t2<=4?'Cepat':t2<=7?'Normal':'Lambat';}
+  function isBelumM(mo){return(mo===12?1:mo+1)>nowM;}
+
+  function renderLpjBox(jenis, label){
+    if(!lpjSatker || !lpjSatker[jenis]){
+      return `<div class="modal-lpj-box">
+        <div class="modal-lpj-box-title">${label}</div>
+        <div class="modal-lpj-na">Bukan satker wajib ${jenis}</div>
+      </div>`;
+    }
+    const d = lpjSatker[jenis];
+    const hist = d.bulan || {};
+    const kls = lpjKlsM(d);
+    const rata2 = d.rata2;
+    const terlambat = d.terlambat || 0;
+
+    const histRows = ALL_M.map(mo => {
+      const mk = String(mo).padStart(2,'0');
+      const tgl = hist[mk];
+      const bulanLabel = BULAN_LPJ_M[mo];
+      if(isBelumM(mo)){
+        return `<div class="modal-lpj-row">
+          <div class="modal-lpj-month">${bulanLabel}</div>
+          <div class="modal-lpj-bar-wrap"><div class="modal-lpj-bar" style="width:0%;background:#E2E8F0"></div></div>
+          <div class="modal-lpj-tgl" style="color:#CBD5E1;font-size:.62rem">—</div>
+        </div>`;
+      }
+      if(!tgl){
+        return `<div class="modal-lpj-row">
+          <div class="modal-lpj-month">${bulanLabel}</div>
+          <div class="modal-lpj-bar-wrap"><div class="modal-lpj-bar" style="width:100%;background:#FEE2E2"></div></div>
+          <div class="modal-lpj-tgl" style="color:var(--red)">—</div>
+        </div>`;
+      }
+      const c2 = lpjTglClsM(parseInt(tgl));
+      const barW = Math.min(100, parseInt(tgl)/10*100);
+      return `<div class="modal-lpj-row">
+        <div class="modal-lpj-month">${bulanLabel}</div>
+        <div class="modal-lpj-bar-wrap"><div class="modal-lpj-bar" style="width:${barW}%;background:${lpjColorM(c2)}"></div></div>
+        <div class="modal-lpj-tgl" style="color:${lpjColorM(c2)}">tgl ${tgl}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="modal-lpj-box">
+      <div class="modal-lpj-box-title">${label}</div>
+      <span class="modal-lpj-badge ${kls}">${lpjBadgeTxtM(kls)}</span>
+      <div class="modal-lpj-rata">${rata2 ? 'tgl ' + rata2 : '—'}</div>
+      <div class="modal-lpj-rata-lbl">rata-rata pengajuan · deadline tgl 10</div>
+      ${terlambat > 0 ? `<div class="modal-lpj-terlambat">⚠️ ${terlambat}x terlambat (>tgl 10)</div>` : ''}
+      <div class="modal-lpj-hist" style="margin-top:10px">${histRows}</div>
+    </div>`;
+  }
+
+  if(!lpjSatker){
+    lpjEl.innerHTML = '<div class="modal-lpj-na" style="grid-column:1/-1">Data LPJ belum tersedia untuk satker ini.</div>';
+  } else {
+    lpjEl.innerHTML =
+      renderLpjBox('pengeluaran', '💸 LPJ Bendahara Pengeluaran') +
+      renderLpjBox('penerimaan',  '💰 LPJ Bendahara Penerimaan');
+  }
+
+  // ── Monthly indicators section in modal (Gaji, PPPK, Rekon, Capaian) ──────
+  var monthlyModalEl = document.getElementById('m-monthly-content');
+  if(monthlyModalEl){
+    monthlyModalEl.innerHTML =
+      renderMonthlyBox(kode, (typeof GAJI_DATA!=='undefined')?GAJI_DATA:{}, MONTHLY_INDICATORS.gaji) +
+      renderMonthlyBox(kode, (typeof PPPK_DATA!=='undefined')?PPPK_DATA:{}, MONTHLY_INDICATORS.pppk) +
+      renderMonthlyBox(kode, (typeof REKON_DATA!=='undefined')?REKON_DATA:{}, MONTHLY_INDICATORS.rekon) +
+      renderMonthlyBox(kode, (typeof CAPAIAN_DATA!=='undefined')?CAPAIAN_DATA:{}, MONTHLY_INDICATORS.capaian);
+  }
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModalDirect(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModal(e){
+  if(e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalDirect(); });
+
+
+// ---- SATKER SPOTLIGHT ----
+var SATKER_LIST = [];
+var comboActiveIdx = -1;
+function initSpotlightDropdown(){
+  SATKER_LIST = [...CMS_DATA].sort(function(a,b){return a.nama.localeCompare(b.nama);});
+  renderComboList(SATKER_LIST);
+}
+function renderComboList(list){
+  var box = document.getElementById('satker-combo-list');
+  if(!list.length){ box.innerHTML = '<div class="combo-empty">Satker tidak ditemukan</div>'; comboActiveIdx=-1; return; }
+  box.innerHTML = list.map(function(r,i){
+    return '<div class="combo-item" data-kode="'+r.kode+'" data-idx="'+i+'" onmousedown="comboPick(\''+r.kode+'\')">'+r.nama+'<span class="combo-kode">('+r.kode+')</span></div>';
+  }).join('');
+  comboActiveIdx = -1;
+}
+function comboOpen(){
+  document.getElementById('satker-combo-list').classList.add('open');
+  comboFilter(document.getElementById('satker-search').value);
+}
+function comboFilter(q){
+  q = (q||'').toLowerCase().trim();
+  var filtered = !q ? SATKER_LIST : SATKER_LIST.filter(function(r){
+    return r.nama.toLowerCase().includes(q) || r.kode.includes(q);
+  });
+  renderComboList(filtered);
+  document.getElementById('satker-combo-list').classList.add('open');
+}
+function comboPick(kode){
+  var r = SATKER_LIST.find(function(x){ return x.kode===kode; });
+  if(!r) return;
+  document.getElementById('satker-search').value = r.nama + ' (' + r.kode + ')';
+  document.getElementById('satker-combo-list').classList.remove('open');
+  renderSpotlight(kode);
+}
+function comboKeydown(e){
+  var list = document.getElementById('satker-combo-list');
+  var items = list.querySelectorAll('.combo-item');
+  if(e.key==='ArrowDown'){ e.preventDefault(); comboActiveIdx=Math.min(comboActiveIdx+1,items.length-1); comboHighlight(items); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); comboActiveIdx=Math.max(comboActiveIdx-1,0); comboHighlight(items); }
+  else if(e.key==='Enter'){ e.preventDefault(); if(comboActiveIdx>=0 && items[comboActiveIdx]) comboPick(items[comboActiveIdx].dataset.kode); }
+  else if(e.key==='Escape'){ list.classList.remove('open'); }
+}
+function comboHighlight(items){
+  items.forEach(function(it,i){ it.classList.toggle('active', i===comboActiveIdx); });
+  if(items[comboActiveIdx]) items[comboActiveIdx].scrollIntoView({block:'nearest'});
+}
+document.addEventListener('click', function(e){
+  var combo = document.getElementById('satker-combo');
+  if(combo && !combo.contains(e.target)) document.getElementById('satker-combo-list').classList.remove('open');
+});
+
+function renderSpotlight(kode){
+  var body = document.getElementById('spotlight-body');
+  if(!kode){
+    body.innerHTML = '<div style="text-align:center;padding:28px;color:var(--gray-400);font-size:.84rem">Pilih satker dari dropdown di atas untuk melihat grafik capaiannya.</div>';
+    return;
+  }
+  var cms = CMS_MAP[kode];
+  var kkp = KKP_MAP[kode];
+  if(!cms){ body.innerHTML='<div style="text-align:center;padding:28px;color:var(--gray-400)">Data tidak ditemukan.</div>'; return; }
+
+  var total = cms.total;
+  var pctNum = total > 0 ? (cms.cms / total * 100) : 0;
+  var cmsPctCls = total===0?'gray':pctNum>=70?'green':pctNum>=40?'amber':'red';
+  var cmsStatusTxt = total===0?'Belum Bertransaksi':pctNum>=70?'✅ CMS ≥ 70% — Target Tercapai':pctNum>=40?'⚠️ CMS < 70% — Perlu Peningkatan':'❌ CMS Sangat Rendah';
+
+  var maxVal = Math.max(cms.cms, cms.debit, cms.teller, 1);
+  var cmsW = (cms.cms/maxVal*100).toFixed(1);
+  var debW = (cms.debit/maxVal*100).toFixed(1);
+  var telW = (cms.teller/maxVal*100).toFixed(1);
+
+  var kkpHTML = '';
+  if(!kkp){
+    kkpHTML = '<div class="sp-no-kkp">Satker ini <strong>tidak wajib KKP</strong> — tidak memiliki proporsi UP KKP.</div>';
+  } else {
+    var trx = kkp.trx;
+    var progPct = Math.min(100,(trx/10)*100).toFixed(1);
+    var kkpCls = trx>=10?'green':trx===0?'red':'amber';
+    var kkpStatusTxt = trx>=10?'✅ ≥ 10 Transaksi — Target Tercapai':trx===0?'❌ Belum Ada Transaksi KKP':'⚠️ '+trx+' / 10 Transaksi';
+    var fmtRpFull = function(n){return n>=1e9?'Rp '+(n/1e9).toFixed(2)+' M':n>=1e6?'Rp '+(n/1e6).toFixed(1)+' jt':'Rp '+n.toLocaleString('id-ID');};
+    kkpHTML =
+      '<div class="sp-status-row" style="margin-bottom:12px"><span class="sp-status-chip '+kkpCls+'">'+kkpStatusTxt+'</span></div>'+
+      '<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">'+
+        '<div style="background:white;border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:120px">'+
+          '<div style="font-size:1.2rem;font-weight:800;color:var(--navy)">'+(kkp.dom>0?fmtRpFull(kkp.dom):'—')+'</div>'+
+          '<div style="font-size:.68rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-top:2px">UP KKP Domestik</div>'+
+        '</div>'+
+        '<div style="background:white;border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:120px">'+
+          '<div style="font-size:1.2rem;font-weight:800;color:var(--navy)">'+(kkp.nondom>0?fmtRpFull(kkp.nondom):'—')+'</div>'+
+          '<div style="font-size:.68rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-top:2px">UP KKP Non-Dom</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sp-kkp-progress">'+
+        '<div style="display:flex;justify-content:space-between;font-size:.73rem;color:var(--gray-600);margin-bottom:4px">'+
+          '<span>Progress Transaksi KKP</span>'+
+          '<span style="font-weight:800;color:'+(trx>=10?'var(--green)':trx===0?'var(--red)':'var(--amber)')+'">'+trx+' / 10 transaksi</span>'+
+        '</div>'+
+        '<div class="sp-prog-track"><div class="sp-prog-fill" style="width:'+progPct+'%;background:'+(trx>=10?'var(--green)':trx===0?'var(--red)':'var(--amber)')+'"></div></div>'+
+        '<div style="font-size:.71rem;color:var(--gray-400)">'+(trx>=10?'Sudah memenuhi target minimal 10 transaksi.':trx===0?'Belum ada transaksi KKP sama sekali.':'Perlu '+(10-trx)+' transaksi lagi untuk memenuhi target.')+'</div>'+
+      '</div>';
+  }
+
+  var stackedBar = total>0 ?
+    '<div style="height:8px;background:var(--gray-200);border-radius:6px;overflow:hidden;display:flex;margin-top:8px">'+
+      '<div style="width:'+(cms.cms/total*100).toFixed(1)+'%;background:var(--teal);transition:width .5s"></div>'+
+      '<div style="width:'+(cms.debit/total*100).toFixed(1)+'%;background:#3B82F6;transition:width .5s"></div>'+
+      '<div style="width:'+(cms.teller/total*100).toFixed(1)+'%;background:var(--amber);transition:width .5s"></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:10px;margin-top:5px;font-size:.67rem;color:var(--gray-500)">'+
+      '<span><span style="display:inline-block;width:7px;height:7px;background:var(--teal);border-radius:2px;margin-right:2px"></span>CMS '+(cms.cms/total*100).toFixed(1)+'%</span>'+
+      '<span><span style="display:inline-block;width:7px;height:7px;background:#3B82F6;border-radius:2px;margin-right:2px"></span>Debit '+(cms.debit/total*100).toFixed(1)+'%</span>'+
+      '<span><span style="display:inline-block;width:7px;height:7px;background:var(--amber);border-radius:2px;margin-right:2px"></span>Teller '+(cms.teller/total*100).toFixed(1)+'%</span>'+
+    '</div>' : '';
+
+  // ---- LPJ Panel ----
+  var lpjSatker = LPJ_DATA[kode] || null;
+  var BULAN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+  function lpjKlasifikasi(tgl, deadline){
+    if(!tgl) return 'belum';
+    var d = parseInt(tgl);
+    return d<=4?'Cepat':d<=7?'Normal':'Lambat';
+  }
+  function lpjBadgeTxt(cls){
+    return {'satset':'🚀 Sat Set','tertib':'👍 Tertib','mepet':'🔥 Mepet','belum':'❌ Belum Kirim','Cepat':'🚀 Cepat','Normal':'👍 Normal','Lambat':'🔥 Lambat','nodata':'—'}[cls]||'—';
+  }
+  function lpjColor(cls){
+    return{satset:'#065F46',tertib:'#1E40AF',mepet:'#D97706',belum:'var(--red)',Cepat:'#065F46',Normal:'#1E40AF',Lambat:'#D97706',nodata:'var(--gray-400)'}[cls]||'var(--gray-400)';
+  }
+
+  function renderLpjBox(jenis, deadline, label){
+    if(!lpjSatker) return '<div class="lpj-box"><div class="lpj-box-title">'+label+'</div><div class="lpj-na">Belum ada data LPJ diupload.</div></div>';
+    var d = lpjSatker[jenis];
+    if(!d) return '<div class="lpj-box"><div class="lpj-box-title">'+label+'</div><div class="lpj-na">Bukan satker wajib '+label+'.</div></div>';
+    var hist = d.bulan || {};
+    var rata2 = d.rata2;
+    var avgCls = d.klasifikasi || (rata2 ? (parseInt(rata2)<=4?'Cepat':parseInt(rata2)<=7?'Normal':'Lambat') : 'nodata');
+    var avgTgl = rata2;
+
+    // hitung dari bulan yang sudah kirim
+    var months = Object.keys(hist).sort();
+    var tglList = months.map(function(m){ return hist[m]; }).filter(function(t){ return t && t!==''; });
+
+    var histRows = months.map(function(mKey){
+      var tgl = hist[mKey];
+      var cls = lpjKlasifikasi(tgl, deadline);
+      var barW = tgl ? Math.min(100, Math.round(parseInt(tgl)/deadline*100)) : 100;
+      var barColor = tgl ? lpjColor(cls) : 'var(--gray-300)';
+      var mIdx = parseInt(mKey)-1;
+      var mLabel = BULAN[mIdx] || mKey;
+      return '<div class="lpj-row">'+
+        '<div class="lpj-month">'+mLabel+'</div>'+
+        '<div class="lpj-bar-wrap">'+
+          '<div class="lpj-bar-fill" style="width:'+barW+'%;background:'+barColor+'">'+
+            (tgl?'<span>tgl '+tgl+'</span>':'')+'</div>'+
+        '</div>'+
+        '<div class="lpj-dot '+cls+'"></div>'+
+        '<div class="lpj-tgl">'+(tgl?tgl:cls==='belum'?'<span style="color:var(--red);font-size:.68rem">belum</span>':'—')+'</div>'+
+      '</div>';
+    }).join('');
+
+    return '<div class="lpj-box">'+
+      '<div class="lpj-box-title">'+label+'</div>'+
+      (avgTgl?
+        '<div class="lpj-badge '+avgCls+'">'+lpjBadgeTxt(avgCls)+'</div>'+
+        '<div class="lpj-avg">Rata-rata tgl '+avgTgl+'</div>'+
+        '<div class="lpj-avg-sub">dari '+tglList.length+' bulan data | deadline tgl '+deadline+'</div>':
+        '<div class="lpj-badge nodata">Belum ada data</div>')+
+      '<div class="lpj-history">'+histRows+'</div>'+
+    '</div>';
+  }
+
+
+  var lpjSection = '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">'+
+    '<div style="font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:4px">📋 Monitoring LPJ Bendahara</div>'+
+    '<div style="font-size:.72rem;color:var(--gray-400);margin-bottom:12px">Ketepatan waktu penyampaian LPJ ke KPPN (deadline: Pengeluaran tgl 10, Penerimaan tgl 10)</div>'+
+    '<div class="lpj-grid">'+
+      renderLpjBox('pengeluaran', 10, '💸 LPJ Bendahara Pengeluaran')+
+      renderLpjBox('penerimaan', 10, '💰 LPJ Bendahara Penerimaan')+
+    '</div>'+
+  '</div>';
+
+  var monthlySection = '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">'+
+    '<div style="font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:4px">📅 Gaji, Rekon &amp; Capaian Output</div>'+
+    '<div style="font-size:.72rem;color:var(--gray-400);margin-bottom:12px">Kecepatan penyampaian per indikator (rata-rata hari)</div>'+
+    '<div class="lpj-grid">'+
+      renderMonthlyBox(kode, (typeof GAJI_DATA!=="undefined")?GAJI_DATA:{}, MONTHLY_INDICATORS.gaji)+
+      renderMonthlyBox(kode, (typeof PPPK_DATA!=="undefined")?PPPK_DATA:{}, MONTHLY_INDICATORS.pppk)+
+      renderMonthlyBox(kode, (typeof REKON_DATA!=="undefined")?REKON_DATA:{}, MONTHLY_INDICATORS.rekon)+
+      renderMonthlyBox(kode, (typeof CAPAIAN_DATA!=="undefined")?CAPAIAN_DATA:{}, MONTHLY_INDICATORS.capaian)+
+    '</div>'+
+  '</div>';
+
+  body.innerHTML =
+    '<div class="sp-status-row"><span class="sp-status-chip '+cmsPctCls+'">'+cmsStatusTxt+'</span></div>'+
+    '<div class="sp-charts-grid">'+
+      '<div class="sp-chart-box">'+
+        '<div class="sp-chart-title">💳 Komposisi Transaksi CMS</div>'+
+        '<div style="margin-bottom:16px">'+
+          '<div class="sp-pct-big '+cmsPctCls+'">'+(total===0?'—':pctNum.toFixed(1)+'%')+'</div>'+
+          '<div style="font-size:.74rem;color:var(--gray-600);margin-top:2px">'+(total===0?'Belum ada transaksi':'dari '+total.toLocaleString('id-ID')+' total transaksi')+'</div>'+
+        '</div>'+
+        '<div class="sp-bar-row"><div class="sp-bar-label">CMS</div><div class="sp-bar-track"><div class="sp-bar-fill" style="width:'+cmsW+'%;background:var(--teal)"><span>'+(cms.cms>0?cms.cms.toLocaleString('id-ID'):'')+'</span></div></div><div class="sp-bar-val">'+cms.cms.toLocaleString('id-ID')+'</div></div>'+
+        '<div class="sp-bar-row"><div class="sp-bar-label">Debit</div><div class="sp-bar-track"><div class="sp-bar-fill" style="width:'+debW+'%;background:#3B82F6"><span>'+(cms.debit>0?cms.debit.toLocaleString('id-ID'):'')+'</span></div></div><div class="sp-bar-val">'+cms.debit.toLocaleString('id-ID')+'</div></div>'+
+        '<div class="sp-bar-row"><div class="sp-bar-label">Teller</div><div class="sp-bar-track"><div class="sp-bar-fill" style="width:'+telW+'%;background:var(--amber)"><span>'+(cms.teller>0?cms.teller.toLocaleString('id-ID'):'')+'</span></div></div><div class="sp-bar-val">'+cms.teller.toLocaleString('id-ID')+'</div></div>'+
+        '<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">'+
+          '<div style="font-size:.8rem;font-weight:800;color:var(--navy)">Total: '+total.toLocaleString('id-ID')+' transaksi</div>'+
+          stackedBar+
+        '</div>'+
+      '</div>'+
+      '<div class="sp-chart-box">'+
+        '<div class="sp-chart-title">🏷️ Kartu Kredit Pemerintah (KKP)</div>'+
+        kkpHTML+
+      '</div>'+
+    '</div>'+
+    lpjSection+
+    monthlySection;
+}
+
+
+
+// ── Per-tab priority render functions ─────────────────────────────────────
+
+function fmtPri(v){
+  if(!v) return '0';
+  if(v>=1e12) return (v/1e12).toFixed(2)+' T';
+  if(v>=1e9)  return (v/1e9).toFixed(1)+' M';
+  if(v>=1e6)  return (v/1e6).toFixed(0)+' jt';
+  return v.toLocaleString('id-ID');
+}
+
+function renderCmsPriority(){
+  var tbody=document.getElementById('cms-priority-tbody');
+  if(!tbody) return;
+  var rows=CMS_DATA.filter(function(r){return r.pct<70&&r.total>0;})
+    .sort(function(a,b){return a.pct-b.pct;});
+  tbody.innerHTML=rows.map(function(r){
+    var barW=Math.round(r.pct);
+    var col=r.pct<30?'var(--red)':r.pct<50?'#D97706':'var(--amber)';
+    return '<tr class="clickable" onclick="openModal('+JSON.stringify(r.kode)+')">'+
+      '<td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">'+r.kode+'</code></td>'+
+      '<td class="satker-name">'+r.nama+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:8px">'+
+        '<div style="flex:1;height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden">'+
+          '<div style="height:100%;width:'+barW+'%;background:'+col+';border-radius:4px"></div>'+
+        '</div>'+
+        '<span style="font-weight:700;color:'+col+';font-size:.78rem;width:42px">'+r.pct.toFixed(1)+'%</span>'+
+      '</div></td>'+
+      '<td class="num">'+r.cms+'</td>'+
+      '<td class="num">'+r.teller+'</td>'+
+      '<td class="num">'+r.total+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderKkpPriority(){
+  var tbody=document.getElementById('kkp-priority-tbody');
+  if(!tbody) return;
+  var rows=KKP_DATA.filter(function(r){return r.trx<10;})
+    .sort(function(a,b){return a.trx-b.trx;});
+  tbody.innerHTML=rows.map(function(r){
+    var col=r.trx===0?'var(--red)':'var(--amber)';
+    var badge=r.trx===0
+      ?'<span style="color:var(--red);font-weight:700">✕ Belum Trx</span>'
+      :'<span style="color:var(--amber);font-weight:700">⚠️ '+r.trx+' Trx</span>';
+    return '<tr class="clickable" onclick="openModal('+JSON.stringify(r.kode)+')">'+
+      '<td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">'+r.kode+'</code></td>'+
+      '<td class="satker-name">'+r.nama+'</td>'+
+      '<td class="num">'+badge+'</td>'+
+      '<td class="num">'+fmtPri(r.dom)+'</td>'+
+      '<td class="num">'+fmtPri(r.nondom)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderLpjPriority(){
+  var tbody=document.getElementById('lpj-priority-tbody');
+  if(!tbody) return;
+  var KLS_ORDER={Lambat:0,belum:1,Normal:2,Cepat:3};
+  function klsOf(d){ if(!d)return 'na'; return d.klasifikasi||(d.rata2?(parseInt(d.rata2)<=4?'Cepat':parseInt(d.rata2)<=7?'Normal':'Lambat'):'belum'); }
+  function klsBadge(k){
+    var m={'Lambat':'<span style="color:#D97706;font-weight:700">🔥 Lambat</span>','belum':'<span style="color:var(--red);font-weight:700">❌ Belum Kirim</span>','Normal':'<span style="color:#1E40AF">👍 Normal</span>','Cepat':'<span style="color:#065F46">🚀 Cepat</span>','na':'<span style="color:var(--gray-400)">—</span>'};
+    return m[k]||'<span style="color:var(--gray-400)">—</span>';
+  }
+  var rows=[];
+  CMS_DATA.forEach(function(r){
+    var sd=LPJ_DATA[r.kode];
+    if(!sd) return;
+    var pen=sd.pengeluaran,pnr=sd.penerimaan;
+    var pk=klsOf(pen),nk=klsOf(pnr);
+    // Only show if at least one is Lambat or belum
+    if(pk!=='Lambat'&&pk!=='belum'&&nk!=='Lambat'&&nk!=='belum') return;
+    var terlambat=(pen?pen.terlambat||0:0)+(pnr?pnr.terlambat||0:0);
+    var worstOrder=Math.min(KLS_ORDER[pk]||9,KLS_ORDER[nk]||9);
+    rows.push({kode:r.kode,nama:r.nama,pk:pk,pr:pen?pen.rata2:null,nk:nk,nr:pnr?pnr.rata2:null,terlambat:terlambat,order:worstOrder});
+  });
+  rows.sort(function(a,b){return a.order-b.order||b.terlambat-a.terlambat;});
+  tbody.innerHTML=rows.map(function(r){
+    return '<tr class="clickable" onclick="openModal('+JSON.stringify(r.kode)+')">'+
+      '<td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">'+r.kode+'</code></td>'+
+      '<td class="satker-name">'+r.nama+'</td>'+
+      '<td>'+klsBadge(r.pk)+'</td>'+
+      '<td class="num">'+(r.pr?'tgl '+r.pr:'—')+'</td>'+
+      '<td>'+klsBadge(r.nk)+'</td>'+
+      '<td class="num">'+(r.nr?'tgl '+r.nr:'—')+'</td>'+
+      '<td class="num">'+(r.terlambat>0?'<span style="color:var(--red);font-weight:700">'+r.terlambat+'x</span>':'—')+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+
+
+// ---- LPJ (Monitoring LPJ Bendahara) — rendered dynamically from LPJ_DATA ----
+var LPJ_STATE = {
+  pengeluaran: { q: '', kls: '', sortK: 'nama', sortD: 1 },
+  penerimaan:  { q: '', kls: '', sortK: 'nama', sortD: 1 }
+};
+var LPJ_MONTH_LABELS = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Agu',9:'Sep',10:'Okt',11:'Nov',12:'Des'};
+
+function lpjKlsOf(d) {
+  if (!d) return 'na';
+  return d.klasifikasi || (d.rata2 != null ? (d.rata2 <= 4 ? 'Cepat' : d.rata2 <= 7 ? 'Normal' : 'Lambat') : 'na');
+}
+function lpjKlsBadge(k) {
+  var m = {
+    Cepat:  '<span style="padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;background:#ECFDF5;color:#065F46">🚀 Cepat</span>',
+    Normal: '<span style="padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;background:#EFF6FF;color:#1E40AF">👍 Normal</span>',
+    Lambat: '<span style="padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;background:#FFF7ED;color:#D97706">🔥 Lambat</span>'
+  };
+  return m[k] || '';
+}
+function lpjMonthCell(tgl) {
+  if (tgl === null || tgl === undefined || tgl === '') {
+    return '<span style="color:var(--red);font-size:.72rem;font-weight:600">—</span>';
+  }
+  var cls = tgl <= 4 ? 'Cepat' : tgl <= 7 ? 'Normal' : 'Lambat';
+  var bg = { Cepat: '#ECFDF5', Normal: '#EFF6FF', Lambat: '#FFF7ED' }[cls];
+  var fg = { Cepat: '#065F46', Normal: '#1E40AF', Lambat: '#D97706' }[cls];
+  return '<span style="display:inline-block;padding:2px 7px;border-radius:12px;font-size:.72rem;font-weight:700;background:' + bg + ';color:' + fg + '">tgl ' + tgl + '</span>';
+}
+
+function lpjAllKodes() {
+  var set = {};
+  Object.keys(LPJ_DATA).forEach(function (k) { set[k] = true; });
+  return Object.keys(set);
+}
+
+function getLpjRows(jenis) {
+  var st = LPJ_STATE[jenis];
+  var kodes = lpjAllKodes();
+  var rows = kodes.map(function (kode) {
+    var entry = LPJ_DATA[kode] || {};
+    var d = entry[jenis] || null;
+    return { kode: kode, nama: entry.nama || kode, d: d, kls: lpjKlsOf(d) };
+  });
+  if (st.q) {
+    var q = st.q.toLowerCase();
+    rows = rows.filter(function (r) { return r.nama.toLowerCase().indexOf(q) !== -1 || r.kode.indexOf(q) !== -1; });
+  }
+  if (st.kls) rows = rows.filter(function (r) { return r.kls === st.kls; });
+  rows.sort(function (a, b) {
+    var k = st.sortK, v;
+    if (k === 'nama') v = a.nama.localeCompare(b.nama);
+    else if (k === 'kode') v = a.kode.localeCompare(b.kode);
+    else if (k === 'kls') { var order = { Cepat: 0, Normal: 1, Lambat: 2, na: 3 }; v = (order[a.kls] || 3) - (order[b.kls] || 3); }
+    else if (k === 'rata2') { var ra = a.d && a.d.rata2 != null ? a.d.rata2 : 9999, rb = b.d && b.d.rata2 != null ? b.d.rata2 : 9999; v = ra - rb; }
+    else { // month column mN
+      var mIdx = parseInt(k.replace('m', ''), 10);
+      var mk = String(mIdx).padStart(2, '0');
+      var va = a.d && a.d.bulan ? a.d.bulan[mk] : null, vb = b.d && b.d.bulan ? b.d.bulan[mk] : null;
+      va = va == null ? 9999 : va; vb = vb == null ? 9999 : vb;
+      v = va - vb;
+    }
+    return st.sortD * v;
+  });
+  return rows;
+}
+
+function renderLpjStats(jenis) {
+  var el = document.getElementById('lpj-stats-' + jenis);
+  if (!el) return;
+  var rows = getLpjRows('__all_unfiltered__' === jenis ? jenis : jenis); // (kept simple; stats use full unfiltered set below)
+  var allRows = lpjAllKodes().map(function (kode) {
+    var entry = LPJ_DATA[kode] || {};
+    var d = entry[jenis] || null;
+    return { kls: lpjKlsOf(d) };
+  });
+  var cepat = allRows.filter(function (r) { return r.kls === 'Cepat'; }).length;
+  var normal = allRows.filter(function (r) { return r.kls === 'Normal'; }).length;
+  var lambat = allRows.filter(function (r) { return r.kls === 'Lambat'; }).length;
+  var na = allRows.filter(function (r) { return r.kls === 'na'; }).length;
+  el.innerHTML =
+    '<div class="lpj-stat-card"><div class="lpj-stat-val lpj-satset">' + cepat + '</div><div class="lpj-stat-lbl">🚀 Cepat (tgl 1-4)</div></div>' +
+    '<div class="lpj-stat-card"><div class="lpj-stat-val lpj-tertib">' + normal + '</div><div class="lpj-stat-lbl">👍 Normal (tgl 5-7)</div></div>' +
+    '<div class="lpj-stat-card"><div class="lpj-stat-val lpj-mepet">' + lambat + '</div><div class="lpj-stat-lbl">🔥 Lambat (tgl 8-10)</div></div>' +
+    '<div class="lpj-stat-card"><div class="lpj-stat-val lpj-na">' + na + '</div><div class="lpj-stat-lbl">Bukan Wajib</div></div>';
+  var tabCount = document.getElementById('lpj-tabcount-' + jenis);
+  if (tabCount) tabCount.textContent = (cepat + normal + lambat) + ' satker';
+}
+
+function renderLpjTable(jenis) {
+  var rows = getLpjRows(jenis);
+  var tbody = document.getElementById('lpj-tbody-' + jenis);
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(function (r) {
+    if (!r.d) {
+      return '<tr onclick="openModal(' + JSON.stringify(r.kode) + ')" class="clickable"><td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">' + r.kode + '</code></td><td class="satker-name">' + r.nama + '</td><td colspan="14" style="color:var(--gray-400);font-style:italic;font-size:.75rem">Bukan satker wajib ' + jenis + '</td></tr>';
+    }
+    var monthCells = Object.keys(LPJ_MONTH_LABELS).map(function (mo) {
+      var mk = String(mo).padStart(2, '0');
+      return '<td class="num">' + lpjMonthCell(r.d.bulan ? r.d.bulan[mk] : null) + '</td>';
+    }).join('');
+    var terlambatBadge = r.d.terlambat > 0 ? ' <span style="margin-left:4px;padding:1px 6px;border-radius:8px;font-size:.68rem;background:var(--red-bg);color:var(--red);font-weight:700">' + r.d.terlambat + 'x terlambat</span>' : '';
+    return '<tr onclick="openModal(' + JSON.stringify(r.kode) + ')" class="clickable"><td><code style="font-size:.72rem;background:#F1F5F9;padding:2px 5px;border-radius:4px">' + r.kode + '</code></td><td class="satker-name">' + r.nama + '</td>' + monthCells +
+      '<td class="num" style="font-weight:700">' + (r.d.rata2 != null ? 'tgl ' + r.d.rata2 : '—') + '</td><td>' + lpjKlsBadge(r.kls) + terlambatBadge + '</td></tr>';
+  }).join('') || '<tr><td colspan="16" class="no-data">Tidak ada data</td></tr>';
+  var countEl = document.getElementById('lpj-count-' + jenis);
+  if (countEl) countEl.textContent = rows.length + ' satker ditampilkan';
+}
+
+function renderLpjPage(jenis) {
+  renderLpjStats(jenis);
+  renderLpjTable(jenis);
+}
+
+function switchLpj(jenis, btn) {
+  document.querySelectorAll('.lpj-panel').forEach(function (p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-sub-btn').forEach(function (b) { b.classList.remove('active'); });
+  document.getElementById('lpj-' + jenis).classList.add('active');
+  if (btn) btn.classList.add('active');
+  renderLpjPage(jenis);
+}
+
+function lpjFilter(jenis) {
+  var qEl = document.getElementById('lpj-search-' + jenis);
+  var kEl = document.getElementById('lpj-filter-' + jenis);
+  LPJ_STATE[jenis].q = qEl ? qEl.value : '';
+  LPJ_STATE[jenis].kls = kEl ? kEl.value : '';
+  renderLpjTable(jenis);
+}
+
+function lpjSortCol(jenis, key) {
+  var st = LPJ_STATE[jenis];
+  st.sortD = st.sortK === key ? -st.sortD : 1;
+  st.sortK = key;
+  document.querySelectorAll('[id^="lpjsa-' + jenis + '-"]').forEach(function (el) { el.innerHTML = '&#x21D5;'; });
+  var arrow = document.getElementById('lpjsa-' + jenis + '-' + key);
+  if (arrow) arrow.innerHTML = st.sortD === 1 ? '&#x2191;' : '&#x2193;';
+  renderLpjTable(jenis);
+}
+
+// ---- Overview summary// ---- Overview summary: banner, cards, gauges — all computed from real data ----
+function fmtInt(n){ return Math.round(n).toLocaleString('id-ID'); }
+
+function renderCmsBanner(){
+  var el = document.getElementById('cms-banner');
+  if(!el) return;
+  var totalCms = 0, totalNonCms = 0;
+  CMS_DATA.forEach(function(r){ totalCms += r.cms||0; totalNonCms += (r.total||0) - (r.cms||0); });
+  var total = totalCms + totalNonCms;
+  var pct = total > 0 ? (totalCms/total*100) : 0;
+  var pctStr = total > 0 ? pct.toFixed(1)+'%' : '—';
+  var ok = pct >= 70;
+  var pctColor = total===0 ? 'var(--gray-400)' : (ok ? 'var(--green)' : 'var(--red)');
+  var barCms = total > 0 ? (totalCms/total*100) : 0;
+  var barNon = total > 0 ? (totalNonCms/total*100) : 0;
+
+  el.innerHTML =
+  '<div style="background:white;border-radius:12px;border:1px solid var(--border);padding:20px 24px;margin-bottom:22px;box-shadow:0 1px 4px rgba(0,0,0,.05)">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">'+
+      '<div>'+
+        '<div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:4px">Capaian CMS Agregat Seluruh Satker</div>'+
+        '<div style="display:flex;align-items:baseline;gap:10px">'+
+          '<span style="font-size:2.8rem;font-weight:800;color:'+pctColor+';line-height:1;font-variant-numeric:tabular-nums">'+pctStr+'</span>'+
+          '<span style="font-size:.85rem;color:var(--gray-600)">dari total <strong>'+fmtInt(total)+'</strong> transaksi</span>'+
+        '</div>'+
+        '<div style="font-size:.73rem;color:var(--gray-400);margin-top:4px">Target: ≥ 70% &nbsp;·&nbsp; Status: <span style="color:'+pctColor+';font-weight:700">'+(total===0?'⚪ BELUM ADA TRANSAKSI':(ok?'✅ TERCAPAI':'❌ BELUM TERCAPAI'))+'</span></div>'+
+      '</div>'+
+      '<div style="flex:1;min-width:260px;max-width:480px">'+
+        '<div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray-600);margin-bottom:6px">'+
+          '<span>CMS: <strong>'+fmtInt(totalCms)+'</strong></span>'+
+          '<span>Non-CMS: <strong>'+fmtInt(totalNonCms)+'</strong></span>'+
+          '<span style="font-weight:700;color:var(--navy)">Total: '+fmtInt(total)+'</span>'+
+        '</div>'+
+        '<div style="height:14px;background:var(--gray-200);border-radius:8px;overflow:hidden;display:flex">'+
+          (total>0 ?
+            '<div style="width:'+barCms+'%;background:var(--green);border-radius:8px 0 0 8px;display:flex;align-items:center;justify-content:center">'+
+              (barCms>18?'<span style="font-size:.62rem;font-weight:700;color:white">CMS '+pct.toFixed(1)+'%</span>':'')+
+            '</div>'+
+            '<div style="width:'+barNon+'%;background:#F59E0B;border-radius:0 8px 8px 0"></div>'
+            : '<div style="width:100%;background:var(--gray-200)"></div>')+
+        '</div>'+
+        '<div style="display:flex;gap:14px;margin-top:8px;font-size:.68rem;color:var(--gray-600)">'+
+          '<span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px;margin-right:3px"></span>CMS</span>'+
+          '<span><span style="display:inline-block;width:8px;height:8px;background:#F59E0B;border-radius:2px;margin-right:3px"></span>Non-CMS</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderSummaryCards(){
+  var el = document.getElementById('summary-cards');
+  if(!el) return;
+  var totalSatker = CMS_DATA.length;
+  var ok = CMS_DATA.filter(function(r){ return r.total>0 && r.pct>=70; }).length;
+  var below = CMS_DATA.filter(function(r){ return r.total>0 && r.pct<70; }).length;
+  var zero = CMS_DATA.filter(function(r){ return !r.total; }).length;
+  var withTrx = ok + below;
+  el.innerHTML =
+    '<div class="card blue"><div class="card-label">Total Satker Aktif</div><div class="card-value">'+totalSatker+'</div><div class="card-sub">Berdasarkan data CMS</div></div>'+
+    '<div class="card green"><div class="card-label">CMS ≥ 70%</div><div class="card-value">'+ok+'</div><div class="card-sub">dari '+withTrx+' satker bertransaksi</div></div>'+
+    '<div class="card red"><div class="card-label">CMS &lt; 70%</div><div class="card-value">'+below+'</div><div class="card-sub">Di bawah target</div></div>'+
+    '<div class="card amber"><div class="card-label">Belum Bertransaksi</div><div class="card-value">'+zero+'</div><div class="card-sub">0 transaksi CMS &amp; non-CMS</div></div>';
+}
+
+function donutSvg(pct, color){
+  var r = 58, circ = 2*Math.PI*r; // ≈364.42
+  var len = Math.max(0, Math.min(100, pct))/100*circ;
+  return '<svg class="donut-svg" viewBox="0 0 150 150">'+
+    '<circle cx="75" cy="75" r="'+r+'" fill="none" stroke="#E2E8F0" stroke-width="15"/>'+
+    '<circle cx="75" cy="75" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="15" class="donut-track" '+
+      'stroke-dasharray="'+len.toFixed(2)+' '+(circ-len).toFixed(2)+'" stroke-dashoffset="'+(circ/4).toFixed(2)+'" '+
+      'stroke-linecap="round" transform="rotate(-90 75 75)"/>'+
+    '<text x="75" y="75" class="donut-text">'+pct.toFixed(1)+'%</text>'+
+  '</svg>';
+}
+
+function renderOverviewGauges(){
+  var el = document.getElementById('overview-gauges');
+  if(!el) return;
+  var cmsWithTrx = CMS_DATA.filter(function(r){ return r.total>0; });
+  var cmsOk = cmsWithTrx.filter(function(r){ return r.pct>=70; }).length;
+  var cmsBelow = cmsWithTrx.length - cmsOk;
+  var cmsZero = CMS_DATA.length - cmsWithTrx.length;
+  var cmsPct = cmsWithTrx.length>0 ? (cmsOk/cmsWithTrx.length*100) : 0;
+
+  var kkpWajib = KKP_DATA.length;
+  var kkpOk = KKP_DATA.filter(function(r){ return r.trx>=10; }).length;
+  var kkpBelow = kkpWajib - kkpOk;
+  var kkpPct = kkpWajib>0 ? (kkpOk/kkpWajib*100) : 0;
+
+  el.innerHTML =
+    '<div class="section">'+
+      '<div class="section-header"><div class="section-title">💳 Capaian Digitalisasi CMS</div></div>'+
+      '<div class="gauge-wrap">'+
+        '<div class="gauge-label">Satker Mencapai Target 70%</div>'+
+        donutSvg(cmsPct, '#1A7A4A')+
+        '<div style="margin-top:8px;font-size:.78rem;color:var(--gray-600);font-weight:600;text-align:center">'+cmsOk+' dari '+cmsWithTrx.length+' satker bertransaksi</div>'+
+        '<div class="gauge-legend">'+
+          '<div class="legend-item"><div class="legend-dot" style="background:#1A7A4A"></div>≥70% ('+cmsOk+')</div>'+
+          '<div class="legend-item"><div class="legend-dot" style="background:#C0392B"></div>&lt;70% ('+cmsBelow+')</div>'+
+          '<div class="legend-item"><div class="legend-dot" style="background:#94A3B8"></div>Nol Trx ('+cmsZero+')</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="section">'+
+      '<div class="section-header"><div class="section-title">🏷️ Capaian Transaksi KKP</div></div>'+
+      '<div class="gauge-wrap">'+
+        '<div class="gauge-label">Satker Wajib KKP &gt; 10 Transaksi</div>'+
+        donutSvg(kkpPct, '#D97706')+
+        '<div style="margin-top:8px;font-size:.78rem;color:var(--gray-600);font-weight:600;text-align:center">'+kkpOk+' dari '+kkpWajib+' satker wajib</div>'+
+        '<div class="gauge-legend">'+
+          '<div class="legend-item"><div class="legend-dot" style="background:#1A7A4A"></div>&gt;10 trx ('+kkpOk+')</div>'+
+          '<div class="legend-item"><div class="legend-dot" style="background:#C0392B"></div>≤10 trx ('+kkpBelow+')</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+}
+
+function renderOverviewStats(){
+  renderCmsBanner();
+  renderSummaryCards();
+  renderOverviewGauges();
+}
+
+// ---- INIT (runs once DOM is ready) ----
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof renderOverviewStats==='function') renderOverviewStats();
+  if(typeof renderCMS==='function') renderCMS();
+  if(typeof renderKKP==='function') renderKKP();
+  if(typeof initSpotlightDropdown==='function') initSpotlightDropdown();
+  if(typeof renderLpjPage==='function'){ renderLpjPage('pengeluaran'); renderLpjPage('penerimaan'); }
+  ['gaji','pppk','rekon','capaian'].forEach(function(k){
+    if(typeof renderMonthlyTable==='function') renderMonthlyTable(k);
+  });
+});
+
+</script>
+</body>
+</html>
